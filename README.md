@@ -19,6 +19,11 @@ public:
 
     uint32_t getAge() const { return age; }
     void setAge(uint32_t age_) { age = age_; }
+    
+    std::string getFullName() const
+    {
+        return getName() + " " + getSurname();
+    }
 
 protected:
     std::string name;
@@ -27,6 +32,9 @@ protected:
 };
 
 ```
+
+REFCPP version:
+
 
 ``` cpp
 
@@ -38,6 +46,10 @@ struct Person :
     Class< Person,
            Features< Name, Surname, Age >>
 {
+    std::string getFullName() const
+    {
+        return get< Name >() + " " + get< Surname >();
+    }
 };
 
 ```

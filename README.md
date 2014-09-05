@@ -1,7 +1,7 @@
 REFCPP - Some reflection in C++ for free
 ========================================
 
-REFCPP is a new way of defining C++ classes that gives up some limited-but-sometimes-enough reflection for free, in both compilation and execution time.
+REFCPP is a new way of defining C++ classes that gives up some limited-but-sometimes-enough reflection for free, in both compile and run time.
 
 The following example shows an ordinary C++ class first and then its persistent version using REFCPP.
 
@@ -37,7 +37,7 @@ REFCPP version:
 
 
 ``` cpp
-
+// Features. Everythin is a type! ;)
 struct Name    : String {};
 struct Surname : String {};
 struct Age     : UInt32 {};
@@ -54,4 +54,43 @@ struct Person :
 
 ```
 
-Reflection in execution time is given through a hierarchy of type descriptors, defined in ref/Descriptors.hpp. These descriptors were used to implement a simple JSON serializer available in examples/json.hpp.
+Run time reflection is given through a hierarchy of type descriptors, defined in ref/Descriptors.hpp. These descriptors were used to implement a simple JSON serializer available in examples/json.hpp.
+
+The following example shows how to use the type descriptors API to iterate over the attributes of a class thus defined.
+
+``` cpp
+Person person;
+
+// ...
+
+const ClassDescriptor * classDesc = person.getClassDescriptor();
+const FeatureDescriptorVector features =
+    classDesc->getAllFeatureDescriptors();
+
+for (size_t i = 0; i < features.size(); i++)
+{
+    const FeatureDescriptor * featureDesc = features[i];
+
+    Holder h = featureDesc->getValue(&person);
+    const TypeDescriptor * typeDesc = h.descriptor();
+
+    if (typeDesc->getKind() == TypeDescriptor::kPrimitive)
+    {
+        const PrimitiveTypeDescriptor * priTypeDesc =
+            static_cast< const PrimitiveTypeDescriptor * >(typeDesc);
+        std::cout << featureDesc->getName() << " = "
+            << priTypeDesc->getString(h) << std::endl;
+    }
+    else
+    {
+        std::cout << featureDesc->getName() << " = non-printable type!" << std::endl;
+    }
+}
+```
+
+Compile-time is given through a set of typedefs available within any class thus defined.
+
+
+What can this approach be used for?
+-----------------------------------
+To avoid having to write anything that involves boilterplate code, such as (de)serializers. 

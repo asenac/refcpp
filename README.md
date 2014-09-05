@@ -1,7 +1,7 @@
 REFCPP - Some reflection in C++ for free
 ========================================
 
-REFCPP is a new way of defining C++ classes that gives up some limited-but-sometimes-enough reflection for free, in both compile and run time.
+REFCPP is a new way of defining C++ classes that gives you some limited-but-sometimes-enough reflection for free, in both compile and run time.
 
 The following example shows an ordinary C++ class first and then its persistent version using REFCPP.
 

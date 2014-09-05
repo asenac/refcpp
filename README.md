@@ -37,7 +37,7 @@ REFCPP version:
 
 
 ``` cpp
-// Features. Everythin is a type! ;)
+// Features. Everything is a type! ;)
 struct Name    : String {};
 struct Surname : String {};
 struct Age     : UInt32 {};

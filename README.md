@@ -88,7 +88,7 @@ for (size_t i = 0; i < features.size(); i++)
 }
 ```
 
-Compile-time is given through a set of typedefs available within any class thus defined.
+Compile-time reflection is given through a set of typedefs available within any class thus defined.
 
 
 What can this approach be used for?

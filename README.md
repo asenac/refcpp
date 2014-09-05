@@ -1,7 +1,7 @@
 REFCPP - Some reflection in C++ for free
 ========================================
 
-REFCPP is a new way of defining classes in C++ that gives up some limited-but-sometimes-enough reflection for free.
+REFCPP is a new way of defining C++ classes that gives up some limited-but-sometimes-enough reflection for free, in both compilation and execution time.
 
 The following example shows an ordinary C++ class first and then its persistent version using REFCPP.
 
@@ -53,3 +53,5 @@ struct Person :
 };
 
 ```
+
+Reflection in execution time is given through a hierarchy of type descriptors, defined in ref/Descriptors.hpp. These descriptors were used to implement a simple JSON serializer available in examples/json.hpp.

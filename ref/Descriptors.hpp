@@ -64,6 +64,12 @@ namespace ref
         Kind getKind() const { return kUnsupported; }
     };
 
+    /**
+     * @brief Interface for descriptors assocated with primitive types.
+     *
+     * @todo Add get and set method for every primitive type supported.
+     * @todo Add PrimitiveKind enum and getPrimitiveKind method.
+     */
     struct PrimitiveTypeDescriptor : TypeDescriptor
     {
         Kind getKind() const { return kPrimitive; }

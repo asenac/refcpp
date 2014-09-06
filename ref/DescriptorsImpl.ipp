@@ -25,14 +25,16 @@ namespace ref
     std::string
     DescriptorImplBase< Descriptor, Impl, T >::getName() const
     {
-        return detail::get_name< T >();
+        static const std::string name = detail::get_name< T >();
+        return name;
     }
 
     template < typename Descriptor, typename Impl, typename T >
     std::string
     DescriptorImplBase< Descriptor, Impl, T >::getFqn() const
     {
-        return detail::get_fqn< T >();
+        static const std::string fqn = detail::get_fqn< T >();
+        return fqn;
     }
 
     // ClassDescriptorImpl

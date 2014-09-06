@@ -178,6 +178,13 @@ namespace ref
     }
 
     template < typename Class >
+    bool ClassDescriptorImpl< Class >::isAbstract() const
+    {
+        typedef typename boost::is_abstract< Class >::type is_abstract;
+        return is_abstract::value;
+    }
+
+    template < typename Class >
     const FeatureDescriptor *
     ClassDescriptorImpl< Class >::getFeatureDescriptor(std::string name) const
     {

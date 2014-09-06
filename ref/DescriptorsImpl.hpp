@@ -36,6 +36,8 @@ namespace ref
 
         FeatureDescriptorVector getAllFeatureDescriptors() const;
 
+        bool isAbstract() const;
+
         const FeatureDescriptor * getFeatureDescriptor(std::string name) const;
 
         ModelClass * get(Holder h) const;

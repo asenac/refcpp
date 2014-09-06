@@ -90,6 +90,8 @@ namespace ref
 
         virtual FeatureDescriptorVector getAllFeatureDescriptors() const = 0;
 
+        virtual bool isAbstract() const = 0;
+
         /**
          * @brief Find feature descriptor by its name.
          *

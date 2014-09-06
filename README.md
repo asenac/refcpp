@@ -90,7 +90,35 @@ for (size_t i = 0; i < features.size(); i++)
 
 Compile-time reflection is given through a set of typedefs available within any class thus defined.
 
+Inheritance
+-----------
+
+Inheritance is supported through the third parameter of Class template, although
+multiple inheritance is not supported (yet?).
+
+The following example shows how to specify a parent class.
+
+``` cpp
+struct Name    : String {};
+struct Surname : String {};
+struct Age     : UInt32 {};
+struct Alive   : Bool {};
+struct Emails  : Feature< std::vector< std::string > >{};
+
+// Classes
+struct Animal :
+    Class< Animal, Features< Alive, Age > >
+{
+};
+
+struct Person :
+    Class< Person,
+           Features< Name, Surname, Emails >,
+           Animal > // Parent class
+{
+};
+```
 
 What can this approach be used for?
 -----------------------------------
-To avoid having to write anything that involves boilterplate code, such as (de)serializers. 
+To avoid having to write anything that involves boilerplate code, such as (de)serializers.

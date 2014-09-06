@@ -30,6 +30,9 @@ namespace ref
         virtual Holder create() const = 0;
 
         virtual void copy(Holder src, Holder dst) const = 0;
+
+        template < typename T >
+        static const TypeDescriptor * getDescriptor();
     };
 
     struct UnsupportedTypeDescriptor : TypeDescriptor

@@ -221,7 +221,7 @@ namespace ref
     const TypeDescriptor *
     FeatureDescriptorImpl< Class, Feature >::getTypeDescriptor() const
     {
-        return detail::GetDescriptorType< typename Feature::type >::type::instance();
+        return TypeDescriptor::getDescriptor< typename Feature::type >();
     }
 
     template < typename Class, typename Feature >
@@ -384,6 +384,12 @@ namespace ref
     template < typename T >
     void UnsupportedTypeDescriptorImpl< T >::copy(Holder, Holder) const
     {
+    }
+
+    template < typename T >
+    const TypeDescriptor * TypeDescriptor::getDescriptor()
+    {
+        return detail::GetDescriptorType< T >::type::instance();
     }
 
 } // namespace ref

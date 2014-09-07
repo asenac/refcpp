@@ -32,7 +32,7 @@ namespace ref
          * descriptor and returns it inside a holder.
          *
          * @return A valid holder for supported types. An invalid holder
-         * for unsupported types.
+         * for unsupported types and abstract classes.
          */
         virtual Holder create() const = 0;
 

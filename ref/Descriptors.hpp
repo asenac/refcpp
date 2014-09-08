@@ -22,7 +22,7 @@ namespace ref
     {
         enum Kind
         {
-            kClass, kPrimitive, kList, kMap, kUnsupported
+            kClass, kPrimitive, kList, kMap, kSet, kPair, kUnsupported
         };
 
         virtual Kind getKind() const = 0;
@@ -206,6 +206,16 @@ namespace ref
         virtual void setValue(Holder h, std::vector< Holder > value) const = 0;
 
         Kind getKind() const { return kList; }
+    };
+
+    struct SetTypeDescriptor : ContainerTypeDescriptor
+    {
+        Kind getKind() const { return kSet; }
+    };
+
+    struct PairTypeDescriptor : TypeDescriptor
+    {
+        Kind getKind() const { return kPair; }
     };
 
     struct MapTypeDescriptor : TypeDescriptor

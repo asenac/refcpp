@@ -350,6 +350,67 @@ namespace ref
         }
     }
 
+    // SetTypeDescriptor
+
+    template < typename T >
+    Holder SetTypeDescriptorImpl< T >::create() const
+    {
+        return Holder(new T, this, true);
+    }
+
+    template < typename T >
+    const TypeDescriptor * SetTypeDescriptorImpl< T >::getValueTypeDescriptor() const
+    {
+        return detail::GetDescriptorType< typename T::value_type >::type::instance();
+    }
+
+    template < typename T >
+    void SetTypeDescriptorImpl< T >::copy(Holder src, Holder dst) const
+    {
+        assert(src.descriptor() == this && src.get< T >());
+        assert(dst.descriptor() == this && dst.get< T >());
+
+        T * pSrc = src.get< T >();
+        T * pDst = dst.get< T >();
+
+        if (pSrc != pDst)
+        {
+            *pDst = *pSrc;
+        }
+    }
+
+    template < typename T >
+    std::vector< Holder > SetTypeDescriptorImpl< T >::getValue(Holder h) const
+    {
+        const T * t = h.get< T >();
+        assert(t);
+        std::vector< Holder > value;
+
+        for (auto it = t->begin(); it != t->end(); ++it)
+        {
+            value.push_back(Holder(&(*it), getValueTypeDescriptor()));
+        }
+
+        return value;
+    }
+
+    template < typename T >
+    void SetTypeDescriptorImpl< T >::setValue(Holder h, std::vector< Holder > value) const
+    {
+        T * t = h.get< T >();
+        assert(t);
+        t->clear();
+
+        auto valueDesc = getValueTypeDescriptor();
+
+        for (size_t i = 0; i < value.size(); i++)
+        {
+            typename T::value_type t;
+            valueDesc->copy(value[i], Holder(&t, valueDesc));
+            t->insert(t);
+        }
+    }
+
     // MapTypeDescriptor
 
     template < typename T >

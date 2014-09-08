@@ -25,5 +25,22 @@ int main(int argc, char **argv)
                 mapDesc->getMappedTypeDescriptor());
     }
 
+    // Set
+    {
+        typedef std::set< std::string > StringSet;
+
+        const TypeDescriptor * typeDesc =
+            TypeDescriptor::getDescriptor< StringSet >();
+        assert(typeDesc);
+        assert(typeDesc->getKind() == TypeDescriptor::kSet);
+
+        const auto setDesc =
+            static_cast< const SetTypeDescriptor * >(typeDesc);
+
+        assert(setDesc->getValueTypeDescriptor());
+        assert(setDesc->getValueTypeDescriptor()->getKind() ==
+                TypeDescriptor::kPrimitive);
+    }
+
     return 0;
 }

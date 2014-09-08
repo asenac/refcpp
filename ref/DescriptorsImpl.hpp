@@ -2,6 +2,7 @@
 #define REF_DESCRIPTORS_IMPL_HPP
 
 #include <map>
+#include <set>
 #include <ref/Descriptors.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/utility.hpp>
@@ -100,6 +101,22 @@ namespace ref
     };
 
     template < typename T >
+    struct SetTypeDescriptorImpl :
+        DescriptorImplBase < SetTypeDescriptor,
+                             SetTypeDescriptorImpl < T >, T >
+    {
+        Holder create() const;
+
+        void copy(Holder src, Holder dst) const;
+
+        const TypeDescriptor * getValueTypeDescriptor() const;
+
+        std::vector< Holder > getValue(Holder h) const;
+
+        void setValue(Holder h, std::vector< Holder > value) const;
+    };
+
+    template < typename T >
     struct MapTypeDescriptorImpl :
         DescriptorImplBase < MapTypeDescriptor,
                              MapTypeDescriptorImpl < T >, T >
@@ -165,6 +182,12 @@ namespace ref
         struct GetDescriptorType< std::vector< T > >
         {
             typedef ListTypeDescriptorImpl< std::vector< T > > type;
+        };
+
+        template < typename T >
+        struct GetDescriptorType< std::set< T > >
+        {
+            typedef SetTypeDescriptorImpl< std::set< T > > type;
         };
     } // namespace detail
 

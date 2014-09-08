@@ -81,13 +81,14 @@ namespace ref
                 serialize(obj);
             }
             break;
+        case TypeDescriptor::kMap:
         case TypeDescriptor::kList:
             {
                 ++level;
                 os << '[';
 
                 auto vecDesc =
-                    static_cast< const ListTypeDescriptor * >(desc);
+                    static_cast< const ContainerTypeDescriptor * >(desc);
                 const auto values = vecDesc->getValue(h);
 
                 for (size_t i = 0; i < values.size(); i++)

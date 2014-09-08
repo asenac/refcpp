@@ -107,6 +107,14 @@ namespace ref
         Holder create() const;
 
         void copy(Holder src, Holder dst) const;
+
+        const TypeDescriptor * getKeyTypeDescriptor() const;
+
+        const TypeDescriptor * getMappedTypeDescriptor() const;
+
+        const TypeDescriptor * getValueTypeDescriptor() const;
+
+        std::vector< Holder > getValue(Holder h) const;
     };
 
     template < typename T >

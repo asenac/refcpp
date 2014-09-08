@@ -178,7 +178,7 @@ namespace ref
         Kind getKind() const { return kClass; }
     };
 
-    struct ListTypeDescriptor : TypeDescriptor
+    struct ContainerTypeDescriptor : TypeDescriptor
     {
         /**
          * @brief Returns the descriptor for the type of the elements within
@@ -199,7 +199,10 @@ namespace ref
          * @return A vector of holders.
          */
         virtual std::vector< Holder > getValue(Holder h) const = 0;
+    };
 
+    struct ListTypeDescriptor : ContainerTypeDescriptor
+    {
         virtual void setValue(Holder h, std::vector< Holder > value) const = 0;
 
         Kind getKind() const { return kList; }
@@ -207,6 +210,14 @@ namespace ref
 
     struct MapTypeDescriptor : TypeDescriptor
     {
+        virtual const TypeDescriptor * getKeyTypeDescriptor() const = 0;
+
+        virtual const TypeDescriptor * getMappedTypeDescriptor() const = 0;
+
+        virtual const TypeDescriptor * getValueTypeDescriptor() const = 0;
+
+        virtual std::vector< Holder > getValue(Holder h) const = 0;
+
         Kind getKind() const { return kMap; }
     };
 

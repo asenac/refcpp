@@ -373,6 +373,43 @@ namespace ref
         }
     }
 
+    template < typename T >
+    const TypeDescriptor *
+    MapTypeDescriptorImpl< T >::getKeyTypeDescriptor() const
+    {
+        return detail::GetDescriptorType< typename T::key_type >::type::instance();
+    }
+
+    template < typename T >
+    const TypeDescriptor *
+    MapTypeDescriptorImpl< T >::getMappedTypeDescriptor() const
+    {
+        return detail::GetDescriptorType< typename T::mapped_type >::type::instance();
+    }
+
+    template < typename T >
+    const TypeDescriptor *
+    MapTypeDescriptorImpl< T >::getValueTypeDescriptor() const
+    {
+        return detail::GetDescriptorType< typename T::value_type >::type::instance();
+    }
+
+    template < typename T >
+    std::vector< Holder >
+    MapTypeDescriptorImpl< T >::getValue(Holder h) const
+    {
+        const T * t = h.get< T >();
+        assert(t);
+        std::vector< Holder > value;
+
+        for (auto it = t->begin(); it != t->end(); ++it)
+        {
+            value.push_back(Holder(&(*it), getValueTypeDescriptor()));
+        }
+
+        return value;
+    }
+
     // UnsupportedTypeDescriptor
 
     template < typename T >

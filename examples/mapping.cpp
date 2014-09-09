@@ -23,6 +23,18 @@ int main(int argc, char **argv)
                 mapDesc->getMappedTypeDescriptor());
         assert(mapDesc->getKeyTypeDescriptor() ==
                 mapDesc->getMappedTypeDescriptor());
+
+        assert(mapDesc->getValueTypeDescriptor()->getKind() ==
+                TypeDescriptor::kPair);
+
+        const auto pairDesc =
+            static_cast< const PairTypeDescriptor * >(
+                    mapDesc->getValueTypeDescriptor());
+
+        assert(pairDesc->getFirstTypeDescriptor() ==
+                mapDesc->getKeyTypeDescriptor());
+        assert(pairDesc->getSecondTypeDescriptor() ==
+                mapDesc->getMappedTypeDescriptor());
     }
 
     // Set

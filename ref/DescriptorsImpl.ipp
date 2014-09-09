@@ -484,7 +484,7 @@ namespace ref
         {
             typename T::value_type v;
             valueDesc->copy(value[i], Holder(&v, valueDesc));
-            t->insert(t);
+            t->insert(v);
         }
     }
 

@@ -218,15 +218,11 @@ namespace ref
         Kind getKind() const { return kPair; }
     };
 
-    struct MapTypeDescriptor : TypeDescriptor
+    struct MapTypeDescriptor : ContainerTypeDescriptor
     {
         virtual const TypeDescriptor * getKeyTypeDescriptor() const = 0;
 
         virtual const TypeDescriptor * getMappedTypeDescriptor() const = 0;
-
-        virtual const TypeDescriptor * getValueTypeDescriptor() const = 0;
-
-        virtual std::vector< Holder > getValue(Holder h) const = 0;
 
         Kind getKind() const { return kMap; }
     };

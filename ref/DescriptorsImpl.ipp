@@ -405,9 +405,9 @@ namespace ref
 
         for (size_t i = 0; i < value.size(); i++)
         {
-            typename T::value_type t;
-            valueDesc->copy(value[i], Holder(&t, valueDesc));
-            t->insert(t);
+            typename T::value_type v;
+            valueDesc->copy(value[i], Holder(&v, valueDesc));
+            t->insert(v);
         }
     }
 
@@ -469,6 +469,23 @@ namespace ref
         }
 
         return value;
+    }
+
+    template < typename T >
+    void MapTypeDescriptorImpl< T >::setValue(Holder h, std::vector< Holder > value) const
+    {
+        T * t = h.get< T >();
+        assert(t);
+        t->clear();
+
+        auto valueDesc = getValueTypeDescriptor();
+
+        for (size_t i = 0; i < value.size(); i++)
+        {
+            typename T::value_type v;
+            valueDesc->copy(value[i], Holder(&v, valueDesc));
+            t->insert(t);
+        }
     }
 
     // UnsupportedTypeDescriptor

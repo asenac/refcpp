@@ -132,6 +132,8 @@ namespace ref
         const TypeDescriptor * getValueTypeDescriptor() const;
 
         std::vector< Holder > getValue(Holder h) const;
+
+        void setValue(Holder h, std::vector< Holder > value) const;
     };
 
     template < typename T >

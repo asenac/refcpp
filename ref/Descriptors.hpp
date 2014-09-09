@@ -215,6 +215,12 @@ namespace ref
 
     struct PairTypeDescriptor : TypeDescriptor
     {
+        virtual const TypeDescriptor * getFirstTypeDescriptor() const = 0;
+
+        virtual const TypeDescriptor * getSecondTypeDescriptor() const = 0;
+
+        virtual std::pair< Holder, Holder > getValue(Holder h) const = 0;
+
         Kind getKind() const { return kPair; }
     };
 

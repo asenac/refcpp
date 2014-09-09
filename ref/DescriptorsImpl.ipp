@@ -452,7 +452,7 @@ namespace ref
     const TypeDescriptor *
     MapTypeDescriptorImpl< T >::getValueTypeDescriptor() const
     {
-        return detail::GetDescriptorType< typename T::value_type >::type::instance();
+        return detail::GetDescriptorType< value_type >::type::instance();
     }
 
     template < typename T >
@@ -482,10 +482,60 @@ namespace ref
 
         for (size_t i = 0; i < value.size(); i++)
         {
-            typename T::value_type v;
+            value_type v;
             valueDesc->copy(value[i], Holder(&v, valueDesc));
             t->insert(v);
         }
+    }
+
+    // PairTypeDescriptor
+
+    template < typename T >
+    Holder PairTypeDescriptorImpl< T >::create() const
+    {
+        return Holder(new T, this, true);
+    }
+
+    template < typename T >
+    void PairTypeDescriptorImpl< T >::copy(Holder src, Holder dst) const
+    {
+        assert(src.descriptor() == this && src.get< T >());
+        assert(dst.descriptor() == this && dst.get< T >());
+
+        T * pSrc = src.get< T >();
+        T * pDst = dst.get< T >();
+
+        if (pSrc != pDst)
+        {
+            *pDst = *pSrc;
+        }
+    }
+
+    template < typename T >
+    const TypeDescriptor *
+    PairTypeDescriptorImpl< T >::getFirstTypeDescriptor() const
+    {
+        return detail::GetDescriptorType< typename T::first_type >::type::instance();
+    }
+
+    template < typename T >
+    const TypeDescriptor *
+    PairTypeDescriptorImpl< T >::getSecondTypeDescriptor() const
+    {
+        return detail::GetDescriptorType< typename T::second_type >::type::instance();
+    }
+
+    template < typename T >
+    std::pair< Holder, Holder >
+    PairTypeDescriptorImpl< T >::getValue(Holder h) const
+    {
+        const T * t = h.get< T >();
+        assert(t);
+
+        Holder first(&t->first, getFirstTypeDescriptor());
+        Holder second(&t->second, getSecondTypeDescriptor());
+
+        return std::make_pair(first, second);
     }
 
     // UnsupportedTypeDescriptor

@@ -121,6 +121,9 @@ namespace ref
         DescriptorImplBase < MapTypeDescriptor,
                              MapTypeDescriptorImpl < T >, T >
     {
+        typedef std::pair< typename T::key_type, typename T::mapped_type >
+            value_type;
+
         Holder create() const;
 
         void copy(Holder src, Holder dst) const;
@@ -134,6 +137,22 @@ namespace ref
         std::vector< Holder > getValue(Holder h) const;
 
         void setValue(Holder h, std::vector< Holder > value) const;
+    };
+
+    template < typename T >
+    struct PairTypeDescriptorImpl :
+        DescriptorImplBase < PairTypeDescriptor,
+                             PairTypeDescriptorImpl < T >, T >
+    {
+        Holder create() const;
+
+        void copy(Holder src, Holder dst) const;
+
+        const TypeDescriptor * getFirstTypeDescriptor() const;
+
+        const TypeDescriptor * getSecondTypeDescriptor() const;
+
+        std::pair< Holder, Holder > getValue(Holder h) const;
     };
 
     template < typename T >
@@ -178,6 +197,12 @@ namespace ref
         struct GetDescriptorType< std::map< K, T > >
         {
             typedef MapTypeDescriptorImpl< std::map< K, T > > type;
+        };
+
+        template < typename K, typename T >
+        struct GetDescriptorType< std::pair< K, T > >
+        {
+            typedef PairTypeDescriptorImpl< std::pair< K, T > > type;
         };
 
         template < typename T >

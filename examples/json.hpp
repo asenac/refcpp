@@ -81,8 +81,34 @@ namespace ref
                 serialize(obj);
             }
             break;
+        case TypeDescriptor::kPair:
+            {
+                auto pairDesc =
+                    static_cast< const PairTypeDescriptor * >(desc);
+                const auto value = pairDesc->getValue(h);
+
+                ++level;
+                os << '{';
+
+                os << std::endl << indent();
+                os << "\"first\" : ";
+                serialize(value.first);
+
+                os << ',';
+
+                os << std::endl << indent();
+                os << "\"second\" : ";
+                serialize(value.second);
+
+                --level;
+                os << std::endl << indent();
+                os << '}';
+
+            }
+            break;
         case TypeDescriptor::kMap:
         case TypeDescriptor::kList:
+        case TypeDescriptor::kSet:
             {
                 ++level;
                 os << '[';

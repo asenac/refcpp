@@ -22,7 +22,8 @@ namespace ref
     {
         enum Kind
         {
-            kClass, kPrimitive, kList, kMap, kSet, kPair, kUnsupported
+            kClass, kPrimitive, kList, kMap, kSet, kPair, kPointer,
+            kUnsupported
         };
 
         virtual Kind getKind() const = 0;
@@ -231,6 +232,21 @@ namespace ref
         virtual const TypeDescriptor * getMappedTypeDescriptor() const = 0;
 
         Kind getKind() const { return kMap; }
+    };
+
+    struct PointerTypeDescriptor : TypeDescriptor
+    {
+        enum PointerType { kRaw, kUnique, kShared, kWeak };
+
+        virtual PointerType getPointerType() const = 0;
+
+        virtual const TypeDescriptor * getPointedTypeDescriptor() const = 0;
+
+        virtual bool isNull(Holder h) const = 0;
+
+        virtual Holder dereference(Holder h) const = 0;
+
+        Kind getKind() const { return kPointer; }
     };
 
 } // namespace ref

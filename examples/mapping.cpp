@@ -7,6 +7,9 @@ using namespace ref;
 
 int main(int argc, char **argv)
 {
+    const TypeDescriptor * stringTypeDesc =
+        TypeDescriptor::getDescriptor< std::string >();
+
     // Map
     {
         typedef std::map< std::string, std::string > StringMap;
@@ -52,6 +55,20 @@ int main(int argc, char **argv)
         assert(setDesc->getValueTypeDescriptor());
         assert(setDesc->getValueTypeDescriptor()->getKind() ==
                 TypeDescriptor::kPrimitive);
+    }
+
+    // Pointers
+    {
+        typedef std::shared_ptr< std::string > StringPtr;
+
+        const TypeDescriptor * typeDesc =
+            TypeDescriptor::getDescriptor< StringPtr >();
+        assert(typeDesc);
+        assert(typeDesc->getKind() == TypeDescriptor::kPointer);
+
+        const auto ptrDesc =
+            static_cast< const PointerTypeDescriptor * >(typeDesc);
+        assert(ptrDesc->getPointedTypeDescriptor() == stringTypeDesc);
     }
 
     return 0;

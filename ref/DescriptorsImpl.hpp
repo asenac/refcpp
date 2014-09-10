@@ -3,6 +3,7 @@
 
 #include <map>
 #include <set>
+#include <memory>
 #include <ref/Descriptors.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/utility.hpp>
@@ -156,6 +157,24 @@ namespace ref
     };
 
     template < typename T >
+    struct PointerTypeDescriptorImpl :
+        DescriptorImplBase < PointerTypeDescriptor,
+                             PointerTypeDescriptorImpl < T >, T >
+    {
+        Holder create() const;
+
+        void copy(Holder src, Holder dst) const;
+
+        PointerTypeDescriptor::PointerType getPointerType() const;
+
+        const TypeDescriptor * getPointedTypeDescriptor() const;
+
+        bool isNull(Holder h) const;
+
+        Holder dereference(Holder h) const;
+    };
+
+    template < typename T >
     struct UnsupportedTypeDescriptorImpl :
         DescriptorImplBase < UnsupportedTypeDescriptor,
                              UnsupportedTypeDescriptorImpl < T >, T >
@@ -215,6 +234,30 @@ namespace ref
         struct GetDescriptorType< std::set< T > >
         {
             typedef SetTypeDescriptorImpl< std::set< T > > type;
+        };
+
+        template < typename T >
+        struct GetDescriptorType< T* >
+        {
+            typedef PointerTypeDescriptorImpl< T* > type;
+        };
+
+        template < typename T >
+        struct GetDescriptorType< std::shared_ptr< T > >
+        {
+            typedef PointerTypeDescriptorImpl< std::shared_ptr< T > > type;
+        };
+
+        template < typename T >
+        struct GetDescriptorType< std::unique_ptr< T > >
+        {
+            typedef PointerTypeDescriptorImpl< std::unique_ptr< T > > type;
+        };
+
+        template < typename T >
+        struct GetDescriptorType< std::weak_ptr< T > >
+        {
+            typedef PointerTypeDescriptorImpl< std::weak_ptr< T > > type;
         };
     } // namespace detail
 

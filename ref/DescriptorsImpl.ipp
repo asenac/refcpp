@@ -538,6 +538,107 @@ namespace ref
         return std::make_pair(first, second);
     }
 
+    // PointerTypeDescriptor
+
+    template < typename T >
+    Holder PointerTypeDescriptorImpl< T >::create() const
+    {
+        return Holder(new T, this, true);
+    }
+
+    template < typename T >
+    void PointerTypeDescriptorImpl< T >::copy(Holder src, Holder dst) const
+    {
+        assert(src.descriptor() == this && src.get< T >());
+        assert(dst.descriptor() == this && dst.get< T >());
+
+        T * pSrc = src.get< T >();
+        T * pDst = dst.get< T >();
+
+        if (pSrc != pDst)
+        {
+            *pDst = *pSrc;
+        }
+    }
+
+    namespace detail
+    {
+        template < typename T >
+        struct pointer_traits;
+
+        template < typename T >
+        struct pointer_traits< T* >
+        {
+            typedef T element_type;
+            enum { pointer_type = PointerTypeDescriptor::kRaw };
+
+            static T * get(T * t) { return t; }
+        };
+
+        template < typename T >
+        struct pointer_traits< std::shared_ptr< T > >
+        {
+            typedef T element_type;
+            enum { pointer_type = PointerTypeDescriptor::kShared };
+
+            static T * get(std::shared_ptr< T > t) { return t.get(); }
+        };
+
+        template < typename T >
+        struct pointer_traits< std::weak_ptr< T > >
+        {
+            typedef T element_type;
+            enum { pointer_type = PointerTypeDescriptor::kWeak };
+
+            static T * get(std::weak_ptr< T > t) { return t.lock().get(); }
+        };
+
+        template < typename T >
+        struct pointer_traits< std::unique_ptr< T > >
+        {
+            typedef T element_type;
+            enum { pointer_type = PointerTypeDescriptor::kShared };
+
+            static T * get(std::unique_ptr< T > t) { return t.get(); }
+        };
+    } // namespace detail
+
+
+    template < typename T >
+    PointerTypeDescriptor::PointerType
+    PointerTypeDescriptorImpl< T >::getPointerType() const
+    {
+        return static_cast< PointerTypeDescriptor::PointerType >(
+                detail::pointer_traits< T >::pointer_type);
+    }
+
+    template < typename T >
+    const TypeDescriptor *
+    PointerTypeDescriptorImpl< T >::getPointedTypeDescriptor() const
+    {
+        return detail::GetDescriptorType<
+                typename detail::pointer_traits< T >::element_type
+            >::type::instance();
+    }
+
+    template < typename T >
+    bool PointerTypeDescriptorImpl< T >::isNull(Holder h) const
+    {
+        assert(h.descriptor() == this && h.get< T >());
+        T * ph = h.get< T >();
+
+        return detail::pointer_traits< T >::get(*ph);
+    }
+
+    template < typename T >
+    Holder PointerTypeDescriptorImpl< T >::dereference(Holder h) const
+    {
+        assert(h.descriptor() == this && h.get< T >());
+        T * ph = h.get< T >();
+        return Holder(detail::pointer_traits< T >::get(*ph),
+                getPointedTypeDescriptor());
+    }
+
     // UnsupportedTypeDescriptor
 
     template < typename T >

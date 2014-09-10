@@ -70,6 +70,18 @@ int main(int argc, char **argv)
             static_cast< const PointerTypeDescriptor * >(typeDesc);
         assert(ptrDesc->getPointedTypeDescriptor() == stringTypeDesc);
     }
+    {
+        typedef std::string * StringPtr;
+
+        const TypeDescriptor * typeDesc =
+            TypeDescriptor::getDescriptor< StringPtr >();
+        assert(typeDesc);
+        assert(typeDesc->getKind() == TypeDescriptor::kPointer);
+
+        const auto ptrDesc =
+            static_cast< const PointerTypeDescriptor * >(typeDesc);
+        assert(ptrDesc->getPointedTypeDescriptor() == stringTypeDesc);
+    }
 
     return 0;
 }

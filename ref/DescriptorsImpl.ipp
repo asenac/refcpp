@@ -603,7 +603,6 @@ namespace ref
         };
     } // namespace detail
 
-
     template < typename T >
     PointerTypeDescriptor::PointerType
     PointerTypeDescriptorImpl< T >::getPointerType() const

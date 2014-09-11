@@ -52,9 +52,14 @@ namespace ref
             Feature::value = t;
         }
 
-        const ClassDescriptor * getClassDescriptor() const
+        static const ClassDescriptor * getClassDescriptorInstance()
         {
             return ClassDescriptorImpl< Class >::instance();
+        }
+
+        const ClassDescriptor * getClassDescriptor() const
+        {
+            return getClassDescriptorInstance();
         }
     };
 

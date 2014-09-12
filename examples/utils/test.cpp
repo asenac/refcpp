@@ -6,7 +6,7 @@ int main(int argc, char **argv)
 {
     auto companyDesc =
         example::Company::getClassDescriptorInstance();
-    ref::StructuralContext ctx(companyDesc);
+    const ref::StructuralContext ctx(companyDesc);
 
     return 0;
 }

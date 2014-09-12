@@ -10,43 +10,37 @@ namespace
 {
     struct PathItem
     {
-        bool contained;
-        bool canBeASubclass;
+        Reference::ReferenceType referenceType;
         const TypeDescriptor * currentNode;
 
         PathItem()
-            : contained(true)
-            , canBeASubclass(false)
-            , currentNode(nullptr)
+            : referenceType(Reference::kContained)
+            , currentNode()
         {}
     };
 
-    bool isContainerPointer(PointerTypeDescriptor::PointerType type)
+    Reference::ReferenceType
+    getReferenceType(PointerTypeDescriptor::PointerType type)
     {
         switch (type)
         {
         case PointerTypeDescriptor::kUnique:
+            return Reference::kOwned;
         case PointerTypeDescriptor::kShared:
-            return true;
+            return Reference::kSharedOwned;
+        case PointerTypeDescriptor::kWeak:
+            return Reference::kWeak;
         default:
             break;
         }
 
-        return false;
+        return Reference::kRaw;
     }
 } // namespace
 
 struct StructuralContext::Impl
 {
     typedef const ClassDescriptor * Desc;
-
-    struct Reference
-    {
-        Desc classDesc;
-        const FeatureDescriptor * featureDesc;
-        bool canBeASubclass;
-    };
-
     typedef std::vector< Reference > ReferenceVector;
 
     Desc m_rootClassDesc;
@@ -56,10 +50,8 @@ struct StructuralContext::Impl
         std::set< Desc > subclasses;
         std::set< Desc > allSubclasses;
         // incoming
-        ReferenceVector containers;
         ReferenceVector inReferences;
         // outgoing
-        ReferenceVector contents;
         ReferenceVector outReferences;
     };
 
@@ -123,20 +115,16 @@ StructuralContext::Impl::Impl(const ClassDescriptor * rootClassDesc)
                 case TypeDescriptor::kClass:
                     {
                         auto classDesc = static_cast< const ClassDescriptor * >(typeDesc);
-                        const Reference ref {current, feature, currentItem.canBeASubclass};
-                        const Reference inverseRef {classDesc, feature, currentItem.canBeASubclass};
+                        const Reference ref {currentItem.referenceType, current, feature, classDesc};
 
-                        if (currentItem.contained)
+                        m_infoMap[classDesc].inReferences.push_back(ref);
+                        m_infoMap[current].outReferences.push_back(ref);
+
+                        if (currentItem.referenceType == Reference::kContained
+                                || currentItem.referenceType == Reference::kOwned
+                                || currentItem.referenceType == Reference::kSharedOwned)
                         {
-                            m_infoMap[classDesc].containers.push_back(ref);
-                            m_infoMap[current].contents.push_back(inverseRef);
-
                             pending.push_back(classDesc);
-                        }
-                        else
-                        {
-                            m_infoMap[classDesc].inReferences.push_back(ref);
-                            m_infoMap[current].outReferences.push_back(inverseRef);
                         }
                     }
                     break;
@@ -144,13 +132,7 @@ StructuralContext::Impl::Impl(const ClassDescriptor * rootClassDesc)
                     {
                         auto ptrDesc = static_cast< const PointerTypeDescriptor * >(typeDesc);
                         currentItem.currentNode = ptrDesc->getPointedTypeDescriptor();
-                        currentItem.canBeASubclass = true;
-
-                        const bool isContainer = isContainerPointer(ptrDesc->getPointerType());
-
-                        if (!currentItem.contained && isContainer)
-                            throw "Invalid model"; // TODO exception
-                        currentItem.contained = isContainer;
+                        currentItem.referenceType = getReferenceType(ptrDesc->getPointerType());
 
                         path.push_back(currentItem);
                     }
@@ -200,5 +182,23 @@ StructuralContext::~StructuralContext()
 std::vector< const ClassDescriptor * > StructuralContext::getAllClasses() const
 {
     return m_impl->m_allClasses;
+}
+
+std::vector< Reference >
+StructuralContext::getIncomingReferences(const ClassDescriptor * classDesc) const
+{
+    Impl::InfoMap::const_iterator it = m_impl->m_infoMap.find(classDesc);
+    if (it != m_impl->m_infoMap.end())
+        return it->second.inReferences;
+    return std::vector< Reference >(); // TODO Exception?
+}
+
+std::vector< Reference >
+StructuralContext::getOutgoingReferences(const ClassDescriptor * classDesc) const
+{
+    Impl::InfoMap::const_iterator it = m_impl->m_infoMap.find(classDesc);
+    if (it != m_impl->m_infoMap.end())
+        return it->second.outReferences;
+    return std::vector< Reference >(); // TODO Exception?
 }
 

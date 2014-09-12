@@ -8,6 +8,19 @@ namespace ref
     struct ClassDescriptor;
     struct FeatureDescriptor;
 
+    struct Reference
+    {
+        enum ReferenceType
+        {
+            kContained, kRaw, kOwned, kSharedOwned, kWeak
+        };
+
+        ReferenceType type;
+        const ClassDescriptor * classDesc;
+        const FeatureDescriptor * featureDesc;
+        const ClassDescriptor * referencedClassDesc;
+    };
+
     struct StructuralContext
     {
         StructuralContext(const ClassDescriptor * rootClassDesc);
@@ -16,6 +29,10 @@ namespace ref
         const ClassDescriptor * getRootClassDescriptor() const;
 
         std::vector< const ClassDescriptor * > getAllClasses() const;
+
+        std::vector< Reference > getIncomingReferences(const ClassDescriptor * classDesc) const;
+
+        std::vector< Reference > getOutgoingReferences(const ClassDescriptor * classDesc) const;
 
     protected:
         struct Impl;

@@ -24,6 +24,7 @@ namespace ref
     struct StructuralContext
     {
         StructuralContext(const ClassDescriptor * rootClassDesc);
+        StructuralContext(const StructuralContext&) = delete;
         ~StructuralContext();
 
         const ClassDescriptor * getRootClassDescriptor() const;

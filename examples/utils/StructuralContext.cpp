@@ -55,8 +55,8 @@ struct StructuralContext::Impl
         ReferenceVector outReferences;
     };
 
-    typedef std::unordered_map< Desc, ClassInfo > InfoMap;
-    InfoMap m_infoMap;
+    typedef std::unordered_map< Desc, ClassInfo > ClassInfoMap;
+    ClassInfoMap m_classInfoMap;
     std::vector< const ClassDescriptor * > m_allClasses;
 
     Impl (const ClassDescriptor * rootClassDesc);
@@ -85,12 +85,12 @@ StructuralContext::Impl::Impl(const ClassDescriptor * rootClassDesc)
                 pending.push_back(parent);
             }
 
-            m_infoMap[parent].subclasses.insert(current);
+            m_classInfoMap[parent].subclasses.insert(current);
 
             Desc predecessor = current;
             while ((predecessor = predecessor->getParentClassDescriptor()))
             {
-                m_infoMap[predecessor].allSubclasses.insert(current);
+                m_classInfoMap[predecessor].allSubclasses.insert(current);
             }
         }
 
@@ -117,8 +117,8 @@ StructuralContext::Impl::Impl(const ClassDescriptor * rootClassDesc)
                         auto classDesc = static_cast< const ClassDescriptor * >(typeDesc);
                         const Reference ref {currentItem.referenceType, current, feature, classDesc};
 
-                        m_infoMap[classDesc].inReferences.push_back(ref);
-                        m_infoMap[current].outReferences.push_back(ref);
+                        m_classInfoMap[classDesc].inReferences.push_back(ref);
+                        m_classInfoMap[current].outReferences.push_back(ref);
 
                         if (currentItem.referenceType == Reference::kContained
                                 || currentItem.referenceType == Reference::kOwned
@@ -187,8 +187,8 @@ std::vector< const ClassDescriptor * > StructuralContext::getAllClasses() const
 std::vector< Reference >
 StructuralContext::getIncomingReferences(const ClassDescriptor * classDesc) const
 {
-    Impl::InfoMap::const_iterator it = m_impl->m_infoMap.find(classDesc);
-    if (it != m_impl->m_infoMap.end())
+    Impl::ClassInfoMap::const_iterator it = m_impl->m_classInfoMap.find(classDesc);
+    if (it != m_impl->m_classInfoMap.end())
         return it->second.inReferences;
     return std::vector< Reference >(); // TODO Exception?
 }
@@ -196,8 +196,8 @@ StructuralContext::getIncomingReferences(const ClassDescriptor * classDesc) cons
 std::vector< Reference >
 StructuralContext::getOutgoingReferences(const ClassDescriptor * classDesc) const
 {
-    Impl::InfoMap::const_iterator it = m_impl->m_infoMap.find(classDesc);
-    if (it != m_impl->m_infoMap.end())
+    Impl::ClassInfoMap::const_iterator it = m_impl->m_classInfoMap.find(classDesc);
+    if (it != m_impl->m_classInfoMap.end())
         return it->second.outReferences;
     return std::vector< Reference >(); // TODO Exception?
 }

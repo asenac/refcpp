@@ -1,4 +1,4 @@
 #include "company.hpp"
 #include <ref/DescriptorsImpl.ipp>
 
-template class ref::ClassDescriptorImpl< example::Company >;
+template struct ref::ClassDescriptorImpl< example::Company >;

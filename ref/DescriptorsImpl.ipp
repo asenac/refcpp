@@ -94,9 +94,8 @@ namespace ref
         {
             m_allFeatureVec = parent->getAllFeatureDescriptors();
 
-            for (size_t i = 0; i < m_allFeatureVec.size(); i++)
+            for (const auto& feature: m_allFeatureVec)
             {
-                const FeatureDescriptor * feature = m_allFeatureVec[i];
                 m_featureMap.insert(std::make_pair(feature->getName(), feature));
             }
         }
@@ -147,12 +146,12 @@ namespace ref
         const FeatureDescriptorVector features =
             classDesc->getAllFeatureDescriptors();
 
-        for (size_t i = 0; i < features.size(); i++)
+        for (const auto& feature: features)
         {
-            Holder hSrc = features[i]->getValue(pSrc);
-            Holder hDst = features[i]->getValue(pDst);
+            Holder hSrc = feature->getValue(pSrc);
+            Holder hDst = feature->getValue(pDst);
 
-            features[i]->getTypeDescriptor()->copy(hSrc, hDst);
+            feature->getTypeDescriptor()->copy(hSrc, hDst);
         }
     }
 
@@ -206,9 +205,8 @@ namespace ref
     {
         FeatureValueVector values;
 
-        for (size_t i = 0; i < m_allFeatureVec.size(); i++)
+        for (const auto& featureDesc: m_allFeatureVec)
         {
-            const FeatureDescriptor * featureDesc = m_allFeatureVec[i];
             Holder featureValue = featureDesc->getValue(obj);
             values.push_back(std::make_pair(featureDesc, featureValue));
         }
@@ -326,9 +324,9 @@ namespace ref
         assert(t);
         std::vector< Holder > value;
 
-        for (auto it = t->begin(); it != t->end(); ++it)
+        for (auto& i: *t)
         {
-            value.push_back(Holder(&(*it), getValueTypeDescriptor()));
+            value.push_back(Holder(&i, getValueTypeDescriptor()));
         }
 
         return value;
@@ -386,9 +384,9 @@ namespace ref
         assert(t);
         std::vector< Holder > value;
 
-        for (auto it = t->begin(); it != t->end(); ++it)
+        for (auto& i: *t)
         {
-            value.push_back(Holder(&(*it), getValueTypeDescriptor()));
+            value.push_back(Holder(&i, getValueTypeDescriptor()));
         }
 
         return value;
@@ -403,10 +401,10 @@ namespace ref
 
         auto valueDesc = getValueTypeDescriptor();
 
-        for (size_t i = 0; i < value.size(); i++)
+        for (auto& i: value)
         {
             typename T::value_type v;
-            valueDesc->copy(value[i], Holder(&v, valueDesc));
+            valueDesc->copy(i, Holder(&v, valueDesc));
             t->insert(v);
         }
     }
@@ -463,9 +461,9 @@ namespace ref
         assert(t);
         std::vector< Holder > value;
 
-        for (auto it = t->begin(); it != t->end(); ++it)
+        for (auto& i: *t)
         {
-            value.push_back(Holder(&(*it), getValueTypeDescriptor()));
+            value.push_back(Holder(&i, getValueTypeDescriptor()));
         }
 
         return value;
@@ -480,10 +478,10 @@ namespace ref
 
         auto valueDesc = getValueTypeDescriptor();
 
-        for (size_t i = 0; i < value.size(); i++)
+        for (auto& i: value)
         {
             value_type v;
-            valueDesc->copy(value[i], Holder(&v, valueDesc));
+            valueDesc->copy(i, Holder(&v, valueDesc));
             t->insert(v);
         }
     }

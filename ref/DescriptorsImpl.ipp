@@ -13,140 +13,131 @@
 
 namespace ref
 {
-    template < typename Descriptor, typename Impl, typename T >
-    const Descriptor *
-    DescriptorImplBase< Descriptor, Impl, T >::instance()
+    template <typename Descriptor, typename Impl, typename T>
+    const Descriptor* DescriptorImplBase<Descriptor, Impl, T>::instance()
     {
         static Impl instance_;
         return &instance_;
     }
 
-    template < typename Descriptor, typename Impl, typename T >
-    std::string
-    DescriptorImplBase< Descriptor, Impl, T >::getName() const
+    template <typename Descriptor, typename Impl, typename T>
+    std::string DescriptorImplBase<Descriptor, Impl, T>::getName() const
     {
-        static const std::string name = detail::get_name< T >();
+        static const std::string name = detail::get_name<T>();
         return name;
     }
 
-    template < typename Descriptor, typename Impl, typename T >
-    std::string
-    DescriptorImplBase< Descriptor, Impl, T >::getFqn() const
+    template <typename Descriptor, typename Impl, typename T>
+    std::string DescriptorImplBase<Descriptor, Impl, T>::getFqn() const
     {
-        static const std::string fqn = detail::get_fqn< T >();
+        static const std::string fqn = detail::get_fqn<T>();
         return fqn;
     }
 
     // ClassDescriptorImpl
 
+    template <typename Class>
+    const ClassDescriptorImpl<Class>* ClassDescriptorImpl<Class>::instance()
+    {
+        static ClassDescriptorImpl instance_;
+        return &instance_;
+    }
+
     namespace detail
     {
-        template < typename T >
+        template <typename T>
         struct BaseClassDescriptor
         {
-            typedef ClassDescriptorImpl< typename T::base_class > type;
-            static const ClassDescriptor * get()
-            {
-                return type::instance();
-            }
+            typedef ClassDescriptorImpl<typename T::base_class> type;
+            static const ClassDescriptor* get() { return type::instance(); }
         };
 
-        template < >
-        struct BaseClassDescriptor< ModelClass >
+        template <>
+        struct BaseClassDescriptor<ModelClass>
         {
-            static const ClassDescriptor * get()
-            {
-                return NULL;
-            }
+            static const ClassDescriptor* get() { return NULL; }
         };
-    } // namespace detail
+    }  // namespace detail
 
-    template < typename Class >
-    struct ClassDescriptorImpl< Class >::Initializer
+    template <typename Class>
+    struct ClassDescriptorImpl<Class>::Initializer
     {
         ClassDescriptorImpl& d;
 
-        Initializer(ClassDescriptorImpl& d_)
-            : d(d_)
-        {
-        }
+        Initializer(ClassDescriptorImpl& d_) : d(d_) {}
 
-        template < typename Feature >
+        template <typename Feature>
         void operator()(Feature) const
         {
-            const FeatureDescriptor * feature =
-                FeatureDescriptorImpl< Class, Feature >::instance();
+            const FeatureDescriptor* feature =
+                FeatureDescriptorImpl<Class, Feature>::instance();
             d.m_featureVec.push_back(feature);
             d.m_featureMap.insert(std::make_pair(feature->getName(), feature));
         }
     };
 
-    template < typename Class >
-    ClassDescriptorImpl< Class>::ClassDescriptorImpl()
+    template <typename Class>
+    ClassDescriptorImpl<Class>::ClassDescriptorImpl()
     {
-        boost::mpl::for_each< typename Class::features_type >(
-                Initializer(*this));
+        boost::mpl::for_each<typename Class::features_type>(Initializer(*this));
 
-        const ClassDescriptor * parent =
-            detail::BaseClassDescriptor< Class >::get();
+        const ClassDescriptor* parent =
+            detail::BaseClassDescriptor<Class>::get();
 
         if (parent)
         {
             m_allFeatureVec = parent->getAllFeatureDescriptors();
 
-            for (const auto& feature: m_allFeatureVec)
+            for (const auto& feature : m_allFeatureVec)
             {
-                m_featureMap.insert(std::make_pair(feature->getName(), feature));
+                m_featureMap.insert(
+                    std::make_pair(feature->getName(), feature));
             }
         }
 
         std::copy(m_featureVec.begin(), m_featureVec.end(),
-                std::back_inserter(m_allFeatureVec));
+                  std::back_inserter(m_allFeatureVec));
     }
 
     namespace detail
     {
-        template< class Class, typename Enabled = void >
+        template <class Class, typename Enabled = void>
         struct Create
         {
-            static inline ModelClass * call()
-            {
-                return new Class;
-            }
+            static inline ModelClass* call() { return new Class; }
         };
 
-        template< class Class >
-        struct Create< Class,
-            typename boost::enable_if< typename boost::is_abstract< Class >::type >::type >
+        template <class Class>
+        struct Create<Class,
+                      typename boost::enable_if<
+                          typename boost::is_abstract<Class>::type>::type>
         {
-            static inline ModelClass * call() { return nullptr; }
+            static inline ModelClass* call() { return nullptr; }
         };
-    } // namespace detail
+    }  // namespace detail
 
-    template < typename Class >
-    Holder ClassDescriptorImpl< Class >::create() const
+    template <typename Class>
+    Holder ClassDescriptorImpl<Class>::create() const
     {
-        return Holder(detail::Create< Class >::call(), this, true);
+        return Holder(detail::Create<Class>::call(), this, true);
     }
 
-
-    template < typename Class >
-    void ClassDescriptorImpl< Class >::copy(Holder src, Holder dst) const
+    template <typename Class>
+    void ClassDescriptorImpl<Class>::copy(Holder src, Holder dst) const
     {
-        ModelClass * pSrc = src.get< ModelClass >();
-        ModelClass * pDst = dst.get< ModelClass >();
+        ModelClass* pSrc = src.get<ModelClass>();
+        ModelClass* pDst = dst.get<ModelClass>();
 
         assert(pSrc && pDst);
         assert(pSrc->getClassDescriptor() && pDst->getClassDescriptor());
 
-        if (pSrc == pDst)
-            return;
+        if (pSrc == pDst) return;
 
-        const ClassDescriptor * classDesc = pSrc->getClassDescriptor();
+        const ClassDescriptor* classDesc = pSrc->getClassDescriptor();
         const FeatureDescriptorVector features =
             classDesc->getAllFeatureDescriptors();
 
-        for (const auto& feature: features)
+        for (const auto& feature : features)
         {
             Holder hSrc = feature->getValue(pSrc);
             Holder hDst = feature->getValue(pDst);
@@ -155,57 +146,56 @@ namespace ref
         }
     }
 
-    template < typename Class >
-    const ClassDescriptor *
-    ClassDescriptorImpl< Class >::getParentClassDescriptor() const
+    template <typename Class>
+    const ClassDescriptor*
+    ClassDescriptorImpl<Class>::getParentClassDescriptor() const
     {
-        return detail::BaseClassDescriptor< Class >::get();
+        return detail::BaseClassDescriptor<Class>::get();
     }
 
-    template < typename Class >
-    FeatureDescriptorVector
-    ClassDescriptorImpl< Class >::getFeatureDescriptors() const
+    template <typename Class>
+    FeatureDescriptorVector ClassDescriptorImpl<Class>::getFeatureDescriptors()
+        const
     {
         return m_featureVec;
     }
 
-    template < typename Class >
+    template <typename Class>
     FeatureDescriptorVector
-    ClassDescriptorImpl< Class >::getAllFeatureDescriptors() const
+    ClassDescriptorImpl<Class>::getAllFeatureDescriptors() const
     {
         return m_allFeatureVec;
     }
 
-    template < typename Class >
-    bool ClassDescriptorImpl< Class >::isAbstract() const
+    template <typename Class>
+    bool ClassDescriptorImpl<Class>::isAbstract() const
     {
-        typedef typename boost::is_abstract< Class >::type is_abstract;
+        typedef typename boost::is_abstract<Class>::type is_abstract;
         return is_abstract::value;
     }
 
-    template < typename Class >
-    const FeatureDescriptor *
-    ClassDescriptorImpl< Class >::getFeatureDescriptor(std::string name) const
+    template <typename Class>
+    const FeatureDescriptor* ClassDescriptorImpl<Class>::getFeatureDescriptor(
+        std::string name) const
     {
         FeatureDescriptorMap::const_iterator it = m_featureMap.find(name);
-        if (it != m_featureMap.end())
-            return it->second;
+        if (it != m_featureMap.end()) return it->second;
         return nullptr;
     }
 
-    template < typename Class >
-    ModelClass * ClassDescriptorImpl< Class >::get(Holder h) const
+    template <typename Class>
+    ModelClass* ClassDescriptorImpl<Class>::get(Holder h) const
     {
-        return h.get< ModelClass >();
+        return h.get<ModelClass>();
     }
 
-    template < typename Class >
-    FeatureValueVector
-    ClassDescriptorImpl< Class >::getFeatureValues(ModelClass * obj) const
+    template <typename Class>
+    FeatureValueVector ClassDescriptorImpl<Class>::getFeatureValues(
+        ModelClass* obj) const
     {
         FeatureValueVector values;
 
-        for (const auto& featureDesc: m_allFeatureVec)
+        for (const auto& featureDesc : m_allFeatureVec)
         {
             Holder featureValue = featureDesc->getValue(obj);
             values.push_back(std::make_pair(featureDesc, featureValue));
@@ -215,44 +205,44 @@ namespace ref
 
     // FeatureDescriptorImpl
 
-    template < typename Class, typename Feature >
-    const TypeDescriptor *
-    FeatureDescriptorImpl< Class, Feature >::getTypeDescriptor() const
+    template <typename Class, typename Feature>
+    const TypeDescriptor*
+    FeatureDescriptorImpl<Class, Feature>::getTypeDescriptor() const
     {
-        return TypeDescriptor::getDescriptor< typename Feature::type >();
+        return TypeDescriptor::getDescriptor<typename Feature::type>();
     }
 
-    template < typename Class, typename Feature >
-    Holder
-    FeatureDescriptorImpl< Class, Feature >::getValue(ModelClass * obj) const
+    template <typename Class, typename Feature>
+    Holder FeatureDescriptorImpl<Class, Feature>::getValue(
+        ModelClass* obj) const
     {
-        Class * realObj = static_cast< Class * >(obj);
-        return Holder(&realObj->template get< Feature >(), getTypeDescriptor());
+        Class* realObj = static_cast<Class*>(obj);
+        return Holder(&realObj->template get<Feature>(), getTypeDescriptor());
     }
 
-    template < typename Class, typename Feature >
-    const ClassDescriptor *
-    FeatureDescriptorImpl< Class, Feature >::getDefinedIn() const
+    template <typename Class, typename Feature>
+    const ClassDescriptor* FeatureDescriptorImpl<Class, Feature>::getDefinedIn()
+        const
     {
-        return ClassDescriptorImpl< Class >::instance();
+        return ClassDescriptorImpl<Class>::instance();
     }
 
     // PrimitiveTypeDescriptorImpl
 
-    template < typename T >
-    Holder PrimitiveTypeDescriptorImpl< T >::create() const
+    template <typename T>
+    Holder PrimitiveTypeDescriptorImpl<T>::create() const
     {
         return Holder(new T, this, true);
     }
 
-    template < typename T >
-    void PrimitiveTypeDescriptorImpl< T >::copy(Holder src, Holder dst) const
+    template <typename T>
+    void PrimitiveTypeDescriptorImpl<T>::copy(Holder src, Holder dst) const
     {
-        assert(src.descriptor() == this && src.get< T >());
-        assert(dst.descriptor() == this && dst.get< T >());
+        assert(src.descriptor() == this && src.get<T>());
+        assert(dst.descriptor() == this && dst.get<T>());
 
-        T * pSrc = src.get< T >();
-        T * pDst = dst.get< T >();
+        T* pSrc = src.get<T>();
+        T* pDst = dst.get<T>();
 
         if (pSrc != pDst)
         {
@@ -260,56 +250,61 @@ namespace ref
         }
     }
 
-    template < typename T >
-    std::string PrimitiveTypeDescriptorImpl< T >::getString(Holder h) const
+    template <typename T>
+    std::string PrimitiveTypeDescriptorImpl<T>::getString(Holder h) const
     {
-        assert(h.descriptor() == this && h.get< T >());
-        return boost::lexical_cast< std::string >(*h.get< T >());
+        assert(h.descriptor() == this && h.get<T>());
+        return boost::lexical_cast<std::string>(*h.get<T>());
     }
 
-    template < >
-    std::string PrimitiveTypeDescriptorImpl< std::string >::getString(Holder h) const
+    template <>
+    std::string PrimitiveTypeDescriptorImpl<std::string>::getString(
+        Holder h) const
     {
-        assert(h.descriptor() == this && h.get< std::string >());
-        return *h.get< std::string >();
+        assert(h.descriptor() == this && h.get<std::string>());
+        return *h.get<std::string>();
     }
 
-    template < typename T >
-    void PrimitiveTypeDescriptorImpl< T >::setString(Holder h, std::string value) const
+    template <typename T>
+    void PrimitiveTypeDescriptorImpl<T>::setString(Holder h,
+                                                   std::string value) const
     {
-        assert(h.descriptor() == this && h.get< T >());
-        *h.get< T >() = boost::lexical_cast< T >(value);
+        assert(h.descriptor() == this && h.get<T>());
+        *h.get<T>() = boost::lexical_cast<T>(value);
     }
 
-    template < >
-    void PrimitiveTypeDescriptorImpl< std::string >::setString(Holder h, std::string value) const
+    template <>
+    void PrimitiveTypeDescriptorImpl<std::string>::setString(
+        Holder h, std::string value) const
     {
-        assert(h.descriptor() == this && h.get< std::string >());
-        *h.get< std::string >() = value;
+        assert(h.descriptor() == this && h.get<std::string>());
+        *h.get<std::string>() = value;
     }
 
     // ListTypeDescriptor
 
-    template < typename T >
-    Holder ListTypeDescriptorImpl< T >::create() const
+    template <typename T>
+    Holder ListTypeDescriptorImpl<T>::create() const
     {
         return Holder(new T, this, true);
     }
 
-    template < typename T >
-    const TypeDescriptor * ListTypeDescriptorImpl< T >::getValueTypeDescriptor() const
+    template <typename T>
+    const TypeDescriptor* ListTypeDescriptorImpl<T>::getValueTypeDescriptor()
+        const
     {
-        return detail::GetDescriptorType< typename T::value_type >::type::instance();
+        return detail::GetDescriptorType<
+            typename T::value_type>::type::instance();
     }
 
-    template < typename T >
-    void ListTypeDescriptorImpl< T >::copy(Holder src, Holder dst) const
+    template <typename T>
+    void ListTypeDescriptorImpl<T>::copy(Holder src, Holder dst) const
     {
-        assert(src.descriptor() == this && src.get< T >());
-        assert(dst.descriptor() == this && dst.get< T >());
+        assert(src.descriptor() == this && src.get<T>());
+        assert(dst.descriptor() == this && dst.get<T>());
 
-        T * pSrc = src.get< T >();
-        T * pDst = dst.get< T >();
+        T* pSrc = src.get<T>();
+        T* pDst = dst.get<T>();
 
         if (pSrc != pDst)
         {
@@ -317,14 +312,14 @@ namespace ref
         }
     }
 
-    template < typename T >
-    std::vector< Holder > ListTypeDescriptorImpl< T >::getValue(Holder h) const
+    template <typename T>
+    std::vector<Holder> ListTypeDescriptorImpl<T>::getValue(Holder h) const
     {
-        const T * t = h.get< T >();
+        const T* t = h.get<T>();
         assert(t);
-        std::vector< Holder > value;
+        std::vector<Holder> value;
 
-        for (auto& i: *t)
+        for (auto& i : *t)
         {
             value.push_back(Holder(&i, getValueTypeDescriptor()));
         }
@@ -332,10 +327,11 @@ namespace ref
         return value;
     }
 
-    template < typename T >
-    void ListTypeDescriptorImpl< T >::setValue(Holder h, std::vector< Holder > value) const
+    template <typename T>
+    void ListTypeDescriptorImpl<T>::setValue(Holder h,
+                                             std::vector<Holder> value) const
     {
-        T * t = h.get< T >();
+        T* t = h.get<T>();
         assert(t);
 
         t->resize(value.size());
@@ -350,26 +346,28 @@ namespace ref
 
     // SetTypeDescriptor
 
-    template < typename T >
-    Holder SetTypeDescriptorImpl< T >::create() const
+    template <typename T>
+    Holder SetTypeDescriptorImpl<T>::create() const
     {
         return Holder(new T, this, true);
     }
 
-    template < typename T >
-    const TypeDescriptor * SetTypeDescriptorImpl< T >::getValueTypeDescriptor() const
+    template <typename T>
+    const TypeDescriptor* SetTypeDescriptorImpl<T>::getValueTypeDescriptor()
+        const
     {
-        return detail::GetDescriptorType< typename T::value_type >::type::instance();
+        return detail::GetDescriptorType<
+            typename T::value_type>::type::instance();
     }
 
-    template < typename T >
-    void SetTypeDescriptorImpl< T >::copy(Holder src, Holder dst) const
+    template <typename T>
+    void SetTypeDescriptorImpl<T>::copy(Holder src, Holder dst) const
     {
-        assert(src.descriptor() == this && src.get< T >());
-        assert(dst.descriptor() == this && dst.get< T >());
+        assert(src.descriptor() == this && src.get<T>());
+        assert(dst.descriptor() == this && dst.get<T>());
 
-        T * pSrc = src.get< T >();
-        T * pDst = dst.get< T >();
+        T* pSrc = src.get<T>();
+        T* pDst = dst.get<T>();
 
         if (pSrc != pDst)
         {
@@ -377,14 +375,14 @@ namespace ref
         }
     }
 
-    template < typename T >
-    std::vector< Holder > SetTypeDescriptorImpl< T >::getValue(Holder h) const
+    template <typename T>
+    std::vector<Holder> SetTypeDescriptorImpl<T>::getValue(Holder h) const
     {
-        const T * t = h.get< T >();
+        const T* t = h.get<T>();
         assert(t);
-        std::vector< Holder > value;
+        std::vector<Holder> value;
 
-        for (auto& i: *t)
+        for (auto& i : *t)
         {
             value.push_back(Holder(&i, getValueTypeDescriptor()));
         }
@@ -392,16 +390,17 @@ namespace ref
         return value;
     }
 
-    template < typename T >
-    void SetTypeDescriptorImpl< T >::setValue(Holder h, std::vector< Holder > value) const
+    template <typename T>
+    void SetTypeDescriptorImpl<T>::setValue(Holder h,
+                                            std::vector<Holder> value) const
     {
-        T * t = h.get< T >();
+        T* t = h.get<T>();
         assert(t);
         t->clear();
 
         auto valueDesc = getValueTypeDescriptor();
 
-        for (auto& i: value)
+        for (auto& i : value)
         {
             typename T::value_type v;
             valueDesc->copy(i, Holder(&v, valueDesc));
@@ -411,20 +410,20 @@ namespace ref
 
     // MapTypeDescriptor
 
-    template < typename T >
-    Holder MapTypeDescriptorImpl< T >::create() const
+    template <typename T>
+    Holder MapTypeDescriptorImpl<T>::create() const
     {
         return Holder(new T, this, true);
     }
 
-    template < typename T >
-    void MapTypeDescriptorImpl< T >::copy(Holder src, Holder dst) const
+    template <typename T>
+    void MapTypeDescriptorImpl<T>::copy(Holder src, Holder dst) const
     {
-        assert(src.descriptor() == this && src.get< T >());
-        assert(dst.descriptor() == this && dst.get< T >());
+        assert(src.descriptor() == this && src.get<T>());
+        assert(dst.descriptor() == this && dst.get<T>());
 
-        T * pSrc = src.get< T >();
-        T * pDst = dst.get< T >();
+        T* pSrc = src.get<T>();
+        T* pDst = dst.get<T>();
 
         if (pSrc != pDst)
         {
@@ -432,36 +431,36 @@ namespace ref
         }
     }
 
-    template < typename T >
-    const TypeDescriptor *
-    MapTypeDescriptorImpl< T >::getKeyTypeDescriptor() const
+    template <typename T>
+    const TypeDescriptor* MapTypeDescriptorImpl<T>::getKeyTypeDescriptor() const
     {
-        return detail::GetDescriptorType< typename T::key_type >::type::instance();
+        return detail::GetDescriptorType<
+            typename T::key_type>::type::instance();
     }
 
-    template < typename T >
-    const TypeDescriptor *
-    MapTypeDescriptorImpl< T >::getMappedTypeDescriptor() const
+    template <typename T>
+    const TypeDescriptor* MapTypeDescriptorImpl<T>::getMappedTypeDescriptor()
+        const
     {
-        return detail::GetDescriptorType< typename T::mapped_type >::type::instance();
+        return detail::GetDescriptorType<
+            typename T::mapped_type>::type::instance();
     }
 
-    template < typename T >
-    const TypeDescriptor *
-    MapTypeDescriptorImpl< T >::getValueTypeDescriptor() const
+    template <typename T>
+    const TypeDescriptor* MapTypeDescriptorImpl<T>::getValueTypeDescriptor()
+        const
     {
-        return detail::GetDescriptorType< value_type >::type::instance();
+        return detail::GetDescriptorType<value_type>::type::instance();
     }
 
-    template < typename T >
-    std::vector< Holder >
-    MapTypeDescriptorImpl< T >::getValue(Holder h) const
+    template <typename T>
+    std::vector<Holder> MapTypeDescriptorImpl<T>::getValue(Holder h) const
     {
-        const T * t = h.get< T >();
+        const T* t = h.get<T>();
         assert(t);
-        std::vector< Holder > value;
+        std::vector<Holder> value;
 
-        for (auto& i: *t)
+        for (auto& i : *t)
         {
             value.push_back(Holder(&i, getValueTypeDescriptor()));
         }
@@ -469,16 +468,17 @@ namespace ref
         return value;
     }
 
-    template < typename T >
-    void MapTypeDescriptorImpl< T >::setValue(Holder h, std::vector< Holder > value) const
+    template <typename T>
+    void MapTypeDescriptorImpl<T>::setValue(Holder h,
+                                            std::vector<Holder> value) const
     {
-        T * t = h.get< T >();
+        T* t = h.get<T>();
         assert(t);
         t->clear();
 
         auto valueDesc = getValueTypeDescriptor();
 
-        for (auto& i: value)
+        for (auto& i : value)
         {
             value_type v;
             valueDesc->copy(i, Holder(&v, valueDesc));
@@ -488,20 +488,20 @@ namespace ref
 
     // PairTypeDescriptor
 
-    template < typename T >
-    Holder PairTypeDescriptorImpl< T >::create() const
+    template <typename T>
+    Holder PairTypeDescriptorImpl<T>::create() const
     {
         return Holder(new T, this, true);
     }
 
-    template < typename T >
-    void PairTypeDescriptorImpl< T >::copy(Holder src, Holder dst) const
+    template <typename T>
+    void PairTypeDescriptorImpl<T>::copy(Holder src, Holder dst) const
     {
-        assert(src.descriptor() == this && src.get< T >());
-        assert(dst.descriptor() == this && dst.get< T >());
+        assert(src.descriptor() == this && src.get<T>());
+        assert(dst.descriptor() == this && dst.get<T>());
 
-        T * pSrc = src.get< T >();
-        T * pDst = dst.get< T >();
+        T* pSrc = src.get<T>();
+        T* pDst = dst.get<T>();
 
         if (pSrc != pDst)
         {
@@ -509,25 +509,27 @@ namespace ref
         }
     }
 
-    template < typename T >
-    const TypeDescriptor *
-    PairTypeDescriptorImpl< T >::getFirstTypeDescriptor() const
+    template <typename T>
+    const TypeDescriptor* PairTypeDescriptorImpl<T>::getFirstTypeDescriptor()
+        const
     {
-        return detail::GetDescriptorType< typename T::first_type >::type::instance();
+        return detail::GetDescriptorType<
+            typename T::first_type>::type::instance();
     }
 
-    template < typename T >
-    const TypeDescriptor *
-    PairTypeDescriptorImpl< T >::getSecondTypeDescriptor() const
+    template <typename T>
+    const TypeDescriptor* PairTypeDescriptorImpl<T>::getSecondTypeDescriptor()
+        const
     {
-        return detail::GetDescriptorType< typename T::second_type >::type::instance();
+        return detail::GetDescriptorType<
+            typename T::second_type>::type::instance();
     }
 
-    template < typename T >
-    std::pair< Holder, Holder >
-    PairTypeDescriptorImpl< T >::getValue(Holder h) const
+    template <typename T>
+    std::pair<Holder, Holder> PairTypeDescriptorImpl<T>::getValue(
+        Holder h) const
     {
-        const T * t = h.get< T >();
+        const T* t = h.get<T>();
         assert(t);
 
         Holder first(&t->first, getFirstTypeDescriptor());
@@ -538,20 +540,20 @@ namespace ref
 
     // PointerTypeDescriptor
 
-    template < typename T >
-    Holder PointerTypeDescriptorImpl< T >::create() const
+    template <typename T>
+    Holder PointerTypeDescriptorImpl<T>::create() const
     {
         return Holder(new T, this, true);
     }
 
-    template < typename T >
-    void PointerTypeDescriptorImpl< T >::copy(Holder src, Holder dst) const
+    template <typename T>
+    void PointerTypeDescriptorImpl<T>::copy(Holder src, Holder dst) const
     {
-        assert(src.descriptor() == this && src.get< T >());
-        assert(dst.descriptor() == this && dst.get< T >());
+        assert(src.descriptor() == this && src.get<T>());
+        assert(dst.descriptor() == this && dst.get<T>());
 
-        T * pSrc = src.get< T >();
-        T * pDst = dst.get< T >();
+        T* pSrc = src.get<T>();
+        T* pDst = dst.get<T>();
 
         if (pSrc != pDst)
         {
@@ -561,100 +563,112 @@ namespace ref
 
     namespace detail
     {
-        template < typename T >
+        template <typename T>
         struct pointer_traits;
 
-        template < typename T >
-        struct pointer_traits< T* >
+        template <typename T>
+        struct pointer_traits<T*>
         {
             typedef T element_type;
-            enum { pointer_type = PointerTypeDescriptor::kRaw };
+            enum
+            {
+                pointer_type = PointerTypeDescriptor::kRaw
+            };
 
-            static T * get(T * t) { return t; }
+            static T* get(T* t) { return t; }
         };
 
-        template < typename T >
-        struct pointer_traits< std::shared_ptr< T > >
+        template <typename T>
+        struct pointer_traits<std::shared_ptr<T> >
         {
             typedef T element_type;
-            enum { pointer_type = PointerTypeDescriptor::kShared };
+            enum
+            {
+                pointer_type = PointerTypeDescriptor::kShared
+            };
 
-            static T * get(std::shared_ptr< T > t) { return t.get(); }
+            static T* get(std::shared_ptr<T> t) { return t.get(); }
         };
 
-        template < typename T >
-        struct pointer_traits< std::weak_ptr< T > >
+        template <typename T>
+        struct pointer_traits<std::weak_ptr<T> >
         {
             typedef T element_type;
-            enum { pointer_type = PointerTypeDescriptor::kWeak };
+            enum
+            {
+                pointer_type = PointerTypeDescriptor::kWeak
+            };
 
-            static T * get(std::weak_ptr< T > t) { return t.lock().get(); }
+            static T* get(std::weak_ptr<T> t) { return t.lock().get(); }
         };
 
-        template < typename T >
-        struct pointer_traits< std::unique_ptr< T > >
+        template <typename T>
+        struct pointer_traits<std::unique_ptr<T> >
         {
             typedef T element_type;
-            enum { pointer_type = PointerTypeDescriptor::kShared };
+            enum
+            {
+                pointer_type = PointerTypeDescriptor::kShared
+            };
 
-            static T * get(std::unique_ptr< T > t) { return t.get(); }
+            static T* get(std::unique_ptr<T> t) { return t.get(); }
         };
-    } // namespace detail
+    }  // namespace detail
 
-    template < typename T >
+    template <typename T>
     PointerTypeDescriptor::PointerType
-    PointerTypeDescriptorImpl< T >::getPointerType() const
+    PointerTypeDescriptorImpl<T>::getPointerType() const
     {
-        return static_cast< PointerTypeDescriptor::PointerType >(
-                detail::pointer_traits< T >::pointer_type);
+        return static_cast<PointerTypeDescriptor::PointerType>(
+            detail::pointer_traits<T>::pointer_type);
     }
 
-    template < typename T >
-    const TypeDescriptor *
-    PointerTypeDescriptorImpl< T >::getPointedTypeDescriptor() const
+    template <typename T>
+    const TypeDescriptor*
+    PointerTypeDescriptorImpl<T>::getPointedTypeDescriptor() const
     {
         return detail::GetDescriptorType<
-                typename detail::pointer_traits< T >::element_type
-            >::type::instance();
+            typename detail::pointer_traits<T>::element_type>::type::instance();
     }
 
-    template < typename T >
-    bool PointerTypeDescriptorImpl< T >::isNull(Holder h) const
+    template <typename T>
+    bool PointerTypeDescriptorImpl<T>::isNull(Holder h) const
     {
-        assert(h.descriptor() == this && h.get< T >());
-        T * ph = h.get< T >();
+        assert(h.descriptor() == this && h.get<T>());
 
-        return detail::pointer_traits< T >::get(*ph);
+        T* ph = h.get<T>();
+        return detail::pointer_traits<T>::get(*ph);
     }
 
-    template < typename T >
-    Holder PointerTypeDescriptorImpl< T >::dereference(Holder h) const
+    template <typename T>
+    Holder PointerTypeDescriptorImpl<T>::dereference(Holder h) const
     {
-        assert(h.descriptor() == this && h.get< T >());
-        T * ph = h.get< T >();
-        return Holder(detail::pointer_traits< T >::get(*ph),
-                getPointedTypeDescriptor());
+        assert(h.descriptor() == this && h.get<T>());
+
+        T* ph = h.get<T>();
+        return Holder(detail::pointer_traits<T>::get(*ph),
+                      getPointedTypeDescriptor());
     }
 
     // UnsupportedTypeDescriptor
 
-    template < typename T >
-    Holder UnsupportedTypeDescriptorImpl< T >::create() const
+    template <typename T>
+    Holder UnsupportedTypeDescriptorImpl<T>::create() const
     {
         return Holder();
     }
 
-    template < typename T >
-    void UnsupportedTypeDescriptorImpl< T >::copy(Holder, Holder) const
+    template <typename T>
+    void UnsupportedTypeDescriptorImpl<T>::copy(Holder, Holder) const
     {
     }
 
-    template < typename T >
-    const TypeDescriptor * TypeDescriptor::getDescriptor()
+    template <typename T>
+    const TypeDescriptor* TypeDescriptor::getDescriptor()
     {
-        return detail::GetDescriptorType< T >::type::instance();
+        return detail::GetDescriptorType<T>::type::instance();
     }
 
-} // namespace ref
+}  // namespace ref
 
-#endif // REF_DESCRIPTORS_IMPL_IPP
+#endif  // REF_DESCRIPTORS_IMPL_IPP

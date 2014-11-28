@@ -54,7 +54,7 @@ namespace ref
 
         static const ClassDescriptor * getClassDescriptorInstance()
         {
-            return ClassDescriptorImpl< Class >::instance();
+            return ClassDescriptorImpl< Impl >::instance();
         }
 
         const ClassDescriptor * getClassDescriptor() const

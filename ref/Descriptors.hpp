@@ -201,7 +201,8 @@ namespace ref
          */
         virtual std::vector< Holder > getValue(Holder h) const = 0;
 
-        virtual void setValue(Holder h, std::vector< Holder > value) const = 0;
+        virtual void setValue(Holder h,
+                              const std::vector<Holder>& value) const = 0;
     };
 
     struct ListTypeDescriptor : ContainerTypeDescriptor

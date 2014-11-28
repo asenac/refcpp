@@ -15,9 +15,9 @@ namespace ref
     {
         static const Descriptor* instance();
 
-        std::string getName() const;
+        std::string getName() const override;
 
-        std::string getFqn() const;
+        std::string getFqn() const override;
     };
 
     template <typename Class>
@@ -26,23 +26,24 @@ namespace ref
     {
         ClassDescriptorImpl();
 
-        Holder create() const;
+        Holder create() const override;
 
-        void copy(Holder src, Holder dst) const;
+        void copy(Holder src, Holder dst) const override;
 
-        const ClassDescriptor* getParentClassDescriptor() const;
+        const ClassDescriptor* getParentClassDescriptor() const override;
 
-        FeatureDescriptorVector getFeatureDescriptors() const;
+        FeatureDescriptorVector getFeatureDescriptors() const override;
 
-        FeatureDescriptorVector getAllFeatureDescriptors() const;
+        FeatureDescriptorVector getAllFeatureDescriptors() const override;
 
-        bool isAbstract() const;
+        bool isAbstract() const override;
 
-        const FeatureDescriptor* getFeatureDescriptor(std::string name) const;
+        const FeatureDescriptor* getFeatureDescriptor(
+            std::string name) const override;
 
-        ModelClass* get(Holder h) const;
+        ModelClass* get(Holder h) const override;
 
-        FeatureValueVector getFeatureValues(ModelClass* obj) const;
+        FeatureValueVector getFeatureValues(ModelClass* obj) const override;
 
         static const ClassDescriptorImpl* instance();
 
@@ -62,11 +63,11 @@ namespace ref
         : DescriptorImplBase<FeatureDescriptor,
                              FeatureDescriptorImpl<Class, Feature>, Feature>
     {
-        const TypeDescriptor* getTypeDescriptor() const;
+        const TypeDescriptor* getTypeDescriptor() const override;
 
-        Holder getValue(ModelClass* obj) const;
+        Holder getValue(ModelClass* obj) const override;
 
-        const ClassDescriptor* getDefinedIn() const;
+        const ClassDescriptor* getDefinedIn() const override;
     };
 
     template <typename T>
@@ -74,43 +75,45 @@ namespace ref
         : DescriptorImplBase<PrimitiveTypeDescriptor,
                              PrimitiveTypeDescriptorImpl<T>, T>
     {
-        Holder create() const;
+        Holder create() const override;
 
-        void copy(Holder src, Holder dst) const;
+        void copy(Holder src, Holder dst) const override;
 
-        std::string getString(Holder h) const;
+        std::string getString(Holder h) const override;
 
-        void setString(Holder h, std::string value) const;
+        void setString(Holder h, std::string value) const override;
     };
 
     template <typename T>
     struct ListTypeDescriptorImpl
         : DescriptorImplBase<ListTypeDescriptor, ListTypeDescriptorImpl<T>, T>
     {
-        Holder create() const;
+        Holder create() const override;
 
-        void copy(Holder src, Holder dst) const;
+        void copy(Holder src, Holder dst) const override;
 
-        const TypeDescriptor* getValueTypeDescriptor() const;
+        const TypeDescriptor* getValueTypeDescriptor() const override;
 
-        std::vector<Holder> getValue(Holder h) const;
+        std::vector<Holder> getValue(Holder h) const override;
 
-        void setValue(Holder h, std::vector<Holder> value) const;
+        void setValue(Holder h,
+                      const std::vector<Holder>& value) const override;
     };
 
     template <typename T>
     struct SetTypeDescriptorImpl
         : DescriptorImplBase<SetTypeDescriptor, SetTypeDescriptorImpl<T>, T>
     {
-        Holder create() const;
+        Holder create() const override;
 
-        void copy(Holder src, Holder dst) const;
+        void copy(Holder src, Holder dst) const override;
 
-        const TypeDescriptor* getValueTypeDescriptor() const;
+        const TypeDescriptor* getValueTypeDescriptor() const override;
 
-        std::vector<Holder> getValue(Holder h) const;
+        std::vector<Holder> getValue(Holder h) const override;
 
-        void setValue(Holder h, std::vector<Holder> value) const;
+        void setValue(Holder h,
+                      const std::vector<Holder>& value) const override;
     };
 
     template <typename T>
@@ -120,34 +123,35 @@ namespace ref
         typedef std::pair<typename T::key_type, typename T::mapped_type>
             value_type;
 
-        Holder create() const;
+        Holder create() const override;
 
-        void copy(Holder src, Holder dst) const;
+        void copy(Holder src, Holder dst) const override;
 
-        const TypeDescriptor* getKeyTypeDescriptor() const;
+        const TypeDescriptor* getKeyTypeDescriptor() const override;
 
-        const TypeDescriptor* getMappedTypeDescriptor() const;
+        const TypeDescriptor* getMappedTypeDescriptor() const override;
 
-        const TypeDescriptor* getValueTypeDescriptor() const;
+        const TypeDescriptor* getValueTypeDescriptor() const override;
 
-        std::vector<Holder> getValue(Holder h) const;
+        std::vector<Holder> getValue(Holder h) const override;
 
-        void setValue(Holder h, std::vector<Holder> value) const;
+        void setValue(Holder h,
+                      const std::vector<Holder>& value) const override;
     };
 
     template <typename T>
     struct PairTypeDescriptorImpl
         : DescriptorImplBase<PairTypeDescriptor, PairTypeDescriptorImpl<T>, T>
     {
-        Holder create() const;
+        Holder create() const override;
 
-        void copy(Holder src, Holder dst) const;
+        void copy(Holder src, Holder dst) const override;
 
-        const TypeDescriptor* getFirstTypeDescriptor() const;
+        const TypeDescriptor* getFirstTypeDescriptor() const override;
 
-        const TypeDescriptor* getSecondTypeDescriptor() const;
+        const TypeDescriptor* getSecondTypeDescriptor() const override;
 
-        std::pair<Holder, Holder> getValue(Holder h) const;
+        std::pair<Holder, Holder> getValue(Holder h) const override;
     };
 
     template <typename T>
@@ -155,17 +159,17 @@ namespace ref
         : DescriptorImplBase<PointerTypeDescriptor,
                              PointerTypeDescriptorImpl<T>, T>
     {
-        Holder create() const;
+        Holder create() const override;
 
-        void copy(Holder src, Holder dst) const;
+        void copy(Holder src, Holder dst) const override;
 
-        PointerTypeDescriptor::PointerType getPointerType() const;
+        PointerTypeDescriptor::PointerType getPointerType() const override;
 
-        const TypeDescriptor* getPointedTypeDescriptor() const;
+        const TypeDescriptor* getPointedTypeDescriptor() const override;
 
-        bool isNull(Holder h) const;
+        bool isNull(Holder h) const override;
 
-        Holder dereference(Holder h) const;
+        Holder dereference(Holder h) const override;
     };
 
     template <typename T>
@@ -173,9 +177,9 @@ namespace ref
         : DescriptorImplBase<UnsupportedTypeDescriptor,
                              UnsupportedTypeDescriptorImpl<T>, T>
     {
-        Holder create() const;
+        Holder create() const override;
 
-        void copy(Holder src, Holder dst) const;
+        void copy(Holder src, Holder dst) const override;
     };
 
     namespace detail

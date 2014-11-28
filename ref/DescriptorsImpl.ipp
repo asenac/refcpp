@@ -328,8 +328,8 @@ namespace ref
     }
 
     template <typename T>
-    void ListTypeDescriptorImpl<T>::setValue(Holder h,
-                                             std::vector<Holder> value) const
+    void ListTypeDescriptorImpl<T>::setValue(
+        Holder h, const std::vector<Holder>& value) const
     {
         T* t = h.get<T>();
         assert(t);
@@ -391,8 +391,8 @@ namespace ref
     }
 
     template <typename T>
-    void SetTypeDescriptorImpl<T>::setValue(Holder h,
-                                            std::vector<Holder> value) const
+    void SetTypeDescriptorImpl<T>::setValue(
+        Holder h, const std::vector<Holder>& value) const
     {
         T* t = h.get<T>();
         assert(t);
@@ -469,8 +469,8 @@ namespace ref
     }
 
     template <typename T>
-    void MapTypeDescriptorImpl<T>::setValue(Holder h,
-                                            std::vector<Holder> value) const
+    void MapTypeDescriptorImpl<T>::setValue(
+        Holder h, const std::vector<Holder>& value) const
     {
         T* t = h.get<T>();
         assert(t);

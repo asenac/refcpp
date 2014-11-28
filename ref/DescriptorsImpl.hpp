@@ -81,7 +81,7 @@ namespace ref
 
         std::string getString(Holder h) const override;
 
-        void setString(Holder h, std::string value) const override;
+        void setString(Holder h, const std::string& value) const override;
     };
 
     template <typename T>

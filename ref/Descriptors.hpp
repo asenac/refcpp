@@ -86,7 +86,7 @@ namespace ref
          */
         virtual std::string getString(Holder h) const = 0;
 
-        virtual void setString(Holder h, std::string value) const = 0;
+        virtual void setString(Holder h, const std::string& value) const = 0;
     };
 
     struct FeatureDescriptor : Descriptor

@@ -266,8 +266,8 @@ namespace ref
     }
 
     template <typename T>
-    void PrimitiveTypeDescriptorImpl<T>::setString(Holder h,
-                                                   std::string value) const
+    void PrimitiveTypeDescriptorImpl<T>::setString(
+        Holder h, const std::string& value) const
     {
         assert(h.descriptor() == this && h.get<T>());
         *h.get<T>() = boost::lexical_cast<T>(value);
@@ -275,7 +275,7 @@ namespace ref
 
     template <>
     void PrimitiveTypeDescriptorImpl<std::string>::setString(
-        Holder h, std::string value) const
+        Holder h, const std::string& value) const
     {
         assert(h.descriptor() == this && h.get<std::string>());
         *h.get<std::string>() = value;

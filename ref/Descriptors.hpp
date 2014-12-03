@@ -60,6 +60,12 @@ namespace ref
          */
         template < typename T >
         static const TypeDescriptor * getDescriptor();
+
+        template < typename T >
+        inline const T * as() const
+        {
+            return static_cast<const T *>(this);
+        }
     };
 
     struct UnsupportedTypeDescriptor : TypeDescriptor

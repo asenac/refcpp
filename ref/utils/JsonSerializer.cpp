@@ -79,23 +79,20 @@ void JsonSerializer::serialize(Holder h)
     {
     case TypeDescriptor::kPrimitive:
         {
-            auto primDesc =
-                static_cast< const PrimitiveTypeDescriptor * >(desc);
+            auto primDesc = desc->as<PrimitiveTypeDescriptor>();
             os << '"' << primDesc->getString(h) << '"';
         }
         break;
     case TypeDescriptor::kClass:
         {
-            auto classDesc =
-                static_cast< const ClassDescriptor * >(desc);
+            auto classDesc = desc->as<ClassDescriptor>();
             ModelClass * obj = classDesc->get(h);
             serialize(obj);
         }
         break;
     case TypeDescriptor::kPair:
         {
-            auto pairDesc =
-                static_cast< const PairTypeDescriptor * >(desc);
+            auto pairDesc = desc->as<PairTypeDescriptor>();
             const auto value = pairDesc->getValue(h);
 
             ++level;
@@ -123,8 +120,7 @@ void JsonSerializer::serialize(Holder h)
             ++level;
             os << '[';
 
-            auto vecDesc =
-                static_cast< const ContainerTypeDescriptor * >(desc);
+            auto vecDesc = desc->as<ContainerTypeDescriptor>();
             const auto values = vecDesc->getValue(h);
 
             for (size_t i = 0; i < values.size(); i++)

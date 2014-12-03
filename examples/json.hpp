@@ -43,7 +43,7 @@ namespace ref
         for (size_t i = 0; i < features.size(); i++)
         {
             os << std::endl << indent();
-            os << '"' << features[i].first->getName() << "\" : ";
+            os << '"' << features[i].first->getXmlTag() << "\" : ";
 
             serialize(features[i].second);
 

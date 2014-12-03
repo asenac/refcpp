@@ -21,6 +21,27 @@ namespace detail
         size_t pos = res.rfind(':');
         return pos == std::string::npos? res : res.substr(pos + 1);
     }
+
+    inline std::string convert_to_xmltag(const std::string& name)
+    {
+        std::string res;
+        for (size_t i = 0; i < name.size(); ++i)
+        {
+            const char c = name[i];
+            if (c >= 'A' && c <= 'Z')
+            {
+                if (i)
+                    res += '-';
+                res += (c - 'A' + 'a');
+            }
+            else if (c >= 'a' && c <= 'z')
+                res += c;
+            else
+                res += '-';
+        }
+        return res;
+    }
+
 } // namespace detail
 } // namespace ref
 

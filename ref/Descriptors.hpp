@@ -16,6 +16,8 @@ namespace ref
         virtual std::string getName() const = 0;
 
         virtual std::string getFqn() const = 0;
+
+        virtual std::string getXmlTag() const = 0;
     };
 
     struct TypeDescriptor : Descriptor

@@ -18,6 +18,8 @@ namespace ref
         std::string getName() const override;
 
         std::string getFqn() const override;
+
+        std::string getXmlTag() const override;
     };
 
     template <typename Class>

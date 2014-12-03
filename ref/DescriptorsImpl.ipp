@@ -34,6 +34,13 @@ namespace ref
         return fqn;
     }
 
+    template <typename Descriptor, typename Impl, typename T>
+    std::string DescriptorImplBase<Descriptor, Impl, T>::getXmlTag() const
+    {
+        static const std::string tag = detail::convert_to_xmltag(getName());
+        return tag;
+    }
+
     // ClassDescriptorImpl
 
     template <typename Class>

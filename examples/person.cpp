@@ -1,8 +1,7 @@
 #include <iostream>
 #include <ref/Class.hpp>
 #include <ref/DescriptorsImpl.ipp>
-
-#include "json.hpp"
+#include <ref/utils/JsonSerializer.hpp>
 
 using namespace ref;
 

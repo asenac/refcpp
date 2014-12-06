@@ -21,10 +21,10 @@ int main(int argc, char **argv)
                                   "example::Employee", "example::Company"};
     const auto allClasses = ctx.getAllClasses();
     set<string> fqns;
-    for_each(allClasses.begin(), allClasses.end(), [&](const ClassDescriptor* d)
+    for (auto d: allClasses)
     {
         fqns.insert(d->getFqn());
-    });
+    }
     assert(fqns == expected);
 
     return 0;

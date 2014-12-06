@@ -7,79 +7,74 @@ using namespace ref;
 
 int main(int argc, char **argv)
 {
-    const TypeDescriptor * stringTypeDesc =
-        TypeDescriptor::getDescriptor< std::string >();
+    const TypeDescriptor *stringTypeDesc =
+        TypeDescriptor::getDescriptor<std::string>();
 
     // Map
     {
-        typedef std::map< std::string, std::string > StringMap;
+        typedef std::map<std::string, std::string> StringMap;
 
-        const TypeDescriptor * typeDesc =
-            TypeDescriptor::getDescriptor< StringMap >();
+        const TypeDescriptor *typeDesc =
+            TypeDescriptor::getDescriptor<StringMap>();
         assert(typeDesc);
         assert(typeDesc->getKind() == TypeDescriptor::kMap);
 
-        const auto mapDesc =
-            static_cast< const MapTypeDescriptor * >(typeDesc);
+        const auto mapDesc = typeDesc->as<MapTypeDescriptor>();
 
         assert(mapDesc->getKeyTypeDescriptor() &&
-                mapDesc->getMappedTypeDescriptor());
+               mapDesc->getMappedTypeDescriptor());
         assert(mapDesc->getKeyTypeDescriptor() ==
-                mapDesc->getMappedTypeDescriptor());
+               mapDesc->getMappedTypeDescriptor());
 
         assert(mapDesc->getValueTypeDescriptor()->getKind() ==
-                TypeDescriptor::kPair);
+               TypeDescriptor::kPair);
 
-        const auto pairDesc =
-            static_cast< const PairTypeDescriptor * >(
-                    mapDesc->getValueTypeDescriptor());
+        const auto pairDesc = static_cast<const PairTypeDescriptor *>(
+            mapDesc->getValueTypeDescriptor());
 
         assert(pairDesc->getFirstTypeDescriptor() ==
-                mapDesc->getKeyTypeDescriptor());
+               mapDesc->getKeyTypeDescriptor());
         assert(pairDesc->getSecondTypeDescriptor() ==
-                mapDesc->getMappedTypeDescriptor());
+               mapDesc->getMappedTypeDescriptor());
     }
 
     // Set
     {
-        typedef std::set< std::string > StringSet;
+        typedef std::set<std::string> StringSet;
 
-        const TypeDescriptor * typeDesc =
-            TypeDescriptor::getDescriptor< StringSet >();
+        const TypeDescriptor *typeDesc =
+            TypeDescriptor::getDescriptor<StringSet>();
         assert(typeDesc);
         assert(typeDesc->getKind() == TypeDescriptor::kSet);
 
-        const auto setDesc =
-            static_cast< const SetTypeDescriptor * >(typeDesc);
+        const auto setDesc = typeDesc->as<SetTypeDescriptor>();
 
         assert(setDesc->getValueTypeDescriptor());
         assert(setDesc->getValueTypeDescriptor()->getKind() ==
-                TypeDescriptor::kPrimitive);
+               TypeDescriptor::kPrimitive);
     }
 
     // Pointers
     {
-        typedef std::shared_ptr< std::string > StringPtr;
+        typedef std::shared_ptr<std::string> StringPtr;
 
-        const TypeDescriptor * typeDesc =
-            TypeDescriptor::getDescriptor< StringPtr >();
+        const TypeDescriptor *typeDesc =
+            TypeDescriptor::getDescriptor<StringPtr>();
         assert(typeDesc);
         assert(typeDesc->getKind() == TypeDescriptor::kPointer);
 
-        const auto ptrDesc =
-            static_cast< const PointerTypeDescriptor * >(typeDesc);
+        const auto ptrDesc = typeDesc->as<PointerTypeDescriptor>();
         assert(ptrDesc->getPointedTypeDescriptor() == stringTypeDesc);
     }
     {
-        typedef std::string * StringPtr;
+        typedef std::string *StringPtr;
 
-        const TypeDescriptor * typeDesc =
-            TypeDescriptor::getDescriptor< StringPtr >();
+        const TypeDescriptor *typeDesc =
+            TypeDescriptor::getDescriptor<StringPtr>();
         assert(typeDesc);
         assert(typeDesc->getKind() == TypeDescriptor::kPointer);
 
-        const auto ptrDesc =
-            static_cast< const PointerTypeDescriptor * >(typeDesc);
+        const auto ptrDesc = typeDesc->as<PointerTypeDescriptor>();
         assert(ptrDesc->getPointedTypeDescriptor() == stringTypeDesc);
     }
 

@@ -77,7 +77,7 @@ for (size_t i = 0; i < features.size(); i++)
     if (typeDesc->getKind() == TypeDescriptor::kPrimitive)
     {
         const PrimitiveTypeDescriptor * priTypeDesc =
-            static_cast< const PrimitiveTypeDescriptor * >(typeDesc);
+            typeDesc->as<PrimitiveTypeDescriptor>();
         std::cout << featureDesc->getName() << " = "
             << priTypeDesc->getString(h) << std::endl;
     }

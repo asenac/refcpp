@@ -63,7 +63,7 @@ namespace ref
         template <>
         struct BaseClassDescriptor<ModelClass>
         {
-            static const ClassDescriptor* get() { return NULL; }
+            static const ClassDescriptor* get() { return nullptr; }
         };
     }  // namespace detail
 

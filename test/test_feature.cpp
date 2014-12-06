@@ -41,5 +41,15 @@ int main(int argc, char **argv)
         assert(features[1]->getXmlTag() == "my-feature2");
     }
 
+    {
+        const auto values = classDesc->getFeatureValues(&mtc);
+
+        for (auto value: values)
+        {
+            assert(value.second.isValid());
+            assert(!value.second.isContained());
+        }
+    }
+
     return 0;
 }

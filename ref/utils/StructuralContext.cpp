@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 using namespace ref;
+using namespace std;
 
 namespace
 {
@@ -39,14 +40,14 @@ namespace
 struct StructuralContext::Impl
 {
     typedef const ClassDescriptor* ClassDesc;
-    typedef std::vector<Reference> ReferenceVector;
+    typedef vector<Reference> ReferenceVector;
 
     ClassDesc m_rootClassDesc;
 
     struct ClassInfo
     {
-        std::set<ClassDesc> subclasses;
-        std::set<ClassDesc> allSubclasses;
+        set<ClassDesc> subclasses;
+        set<ClassDesc> allSubclasses;
         // incoming references
         ReferenceVector inReferences;
         ReferenceVector allInReferences;
@@ -55,9 +56,9 @@ struct StructuralContext::Impl
         ReferenceVector allOutReferences;
     };
 
-    typedef std::unordered_map<ClassDesc, ClassInfo> ClassInfoMap;
+    typedef unordered_map<ClassDesc, ClassInfo> ClassInfoMap;
     ClassInfoMap m_classInfoMap;
-    std::vector<const ClassDescriptor*> m_allClasses;
+    vector<const ClassDescriptor*> m_allClasses;
 
     Impl(const ClassDescriptor* rootClassDesc);
 
@@ -67,7 +68,7 @@ struct StructuralContext::Impl
 
         if (it == m_classInfoMap.end())
         {
-            throw std::runtime_error("Invalid class");
+            throw runtime_error("Invalid class");
         }
 
         return it->second;
@@ -77,8 +78,8 @@ struct StructuralContext::Impl
 StructuralContext::Impl::Impl(const ClassDescriptor* rootClassDesc)
     : m_rootClassDesc(rootClassDesc)
 {
-    std::list<ClassDesc> pending;
-    std::set<ClassDesc> processed;
+    list<ClassDesc> pending;
+    set<ClassDesc> processed;
     pending.push_back(rootClassDesc);
 
     while (!pending.empty())
@@ -114,7 +115,7 @@ StructuralContext::Impl::Impl(const ClassDescriptor* rootClassDesc)
         for (auto feature : features)
         {
             auto typeDesc = feature->getTypeDescriptor();
-            std::list<IterationItem> path;
+            list<IterationItem> path;
             IterationItem item;
             item.desc = typeDesc;
             path.push_back(item);
@@ -143,7 +144,7 @@ StructuralContext::Impl::Impl(const ClassDescriptor* rootClassDesc)
                     {
                         if (currentItem.referenceType != Reference::kContained)
                         {
-                            throw std::runtime_error("Invalid model");
+                            throw runtime_error("Invalid model");
                         }
 
                         auto ptrDesc = typeDesc->as<PointerTypeDescriptor>();
@@ -228,31 +229,31 @@ const ClassDescriptor* StructuralContext::getRootClass() const
     return m_impl->m_rootClassDesc;
 }
 
-const std::vector<const ClassDescriptor*>& StructuralContext::getAllClasses()
+const vector<const ClassDescriptor*>& StructuralContext::getAllClasses()
     const
 {
     return m_impl->m_allClasses;
 }
 
-const std::vector<Reference>& StructuralContext::getIncomingReferences(
+const vector<Reference>& StructuralContext::getIncomingReferences(
     const ClassDescriptor* classDesc) const
 {
     return m_impl->getClassInfo(classDesc).inReferences;
 }
 
-const std::vector<Reference>& StructuralContext::getAllIncomingReferences(
+const vector<Reference>& StructuralContext::getAllIncomingReferences(
     const ClassDescriptor* classDesc) const
 {
     return m_impl->getClassInfo(classDesc).allInReferences;
 }
 
-const std::vector<Reference>& StructuralContext::getOutgoingReferences(
+const vector<Reference>& StructuralContext::getOutgoingReferences(
     const ClassDescriptor* classDesc) const
 {
     return m_impl->getClassInfo(classDesc).outReferences;
 }
 
-const std::vector<Reference>& StructuralContext::getAllOutgoingReferences(
+const vector<Reference>& StructuralContext::getAllOutgoingReferences(
     const ClassDescriptor* classDesc) const
 {
     return m_impl->getClassInfo(classDesc).allOutReferences;

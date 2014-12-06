@@ -3,3 +3,6 @@ add_test(test_descriptor test_descriptor)
 
 add_executable(test_feature test_feature.cpp)
 add_test(test_feature test_feature)
+
+add_executable(test_structuralcontext test_structuralcontext.cpp)
+target_link_libraries(test_structuralcontext refcpp example_company)

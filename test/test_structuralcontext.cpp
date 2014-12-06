@@ -1,12 +1,14 @@
 #include <iostream>
-#include "StructuralContext.hpp"
-#include "../company.hpp"
+#include <ref/utils/StructuralContext.hpp>
+#include "../examples/company.hpp"
+
+using namespace ref;
 
 int main(int argc, char **argv)
 {
     auto companyDesc =
         example::Company::getClassDescriptorInstance();
-    const ref::StructuralContext ctx(companyDesc);
+    const StructuralContext ctx(companyDesc);
 
     return 0;
 }

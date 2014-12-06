@@ -10,6 +10,6 @@ include_directories(
 enable_testing()
 
 add_subdirectory(ref)
-add_subdirectory(test)
 add_subdirectory(examples)
+add_subdirectory(test)
 

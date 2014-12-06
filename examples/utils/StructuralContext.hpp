@@ -12,18 +12,22 @@ namespace ref
     {
         enum ReferenceType
         {
-            kContained, kRaw, kOwned, kSharedOwned, kWeak
+            kContained,
+            kRaw,
+            kOwned,
+            kSharedOwned,
+            kWeak
         };
 
         ReferenceType type;
-        const ClassDescriptor * classDesc;
-        const FeatureDescriptor * featureDesc;
-        const ClassDescriptor * referencedClassDesc;
+        const ClassDescriptor* classDesc;
+        const FeatureDescriptor* featureDesc;
+        const ClassDescriptor* referencedClassDesc;
     };
 
     struct StructuralContext
     {
-        StructuralContext(const ClassDescriptor * rootClassDesc);
+        StructuralContext(const ClassDescriptor* rootClassDesc);
         StructuralContext(const StructuralContext&) = delete;
         ~StructuralContext();
 
@@ -39,8 +43,8 @@ namespace ref
 
     protected:
         struct Impl;
-        Impl * m_impl;
+        Impl* m_impl;
     };
-} // namespace ref
+}  // namespace ref
 
-#endif // REFCPP_STRUCTURAL_CONTEXT_HPP
+#endif  // REFCPP_STRUCTURAL_CONTEXT_HPP

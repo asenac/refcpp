@@ -49,8 +49,10 @@ struct StructuralContext::Impl
         std::set<ClassDesc> allSubclasses;
         // incoming references
         ReferenceVector inReferences;
+        ReferenceVector allInReferences;
         // outgoing references
         ReferenceVector outReferences;
+        ReferenceVector allOutReferences;
     };
 
     typedef std::unordered_map<ClassDesc, ClassInfo> ClassInfoMap;
@@ -58,6 +60,18 @@ struct StructuralContext::Impl
     std::vector<const ClassDescriptor*> m_allClasses;
 
     Impl(const ClassDescriptor* rootClassDesc);
+
+    const ClassInfo& getClassInfo(ClassDesc classDesc) const
+    {
+        ClassInfoMap::const_iterator it = m_classInfoMap.find(classDesc);
+
+        if (it == m_classInfoMap.end())
+        {
+            throw std::runtime_error("Invalid class");
+        }
+
+        return it->second;
+    }
 };
 
 StructuralContext::Impl::Impl(const ClassDescriptor* rootClassDesc)
@@ -173,6 +187,33 @@ StructuralContext::Impl::Impl(const ClassDescriptor* rootClassDesc)
     }
 
     m_allClasses = {processed.begin(), processed.end()};
+
+    // All references
+    for (auto& it: m_classInfoMap)
+    {
+        ClassInfo& classInfo = it.second;
+        for (const auto& subclass: classInfo.allSubclasses)
+        {
+            ClassInfo& subClassInfo = m_classInfoMap[subclass];
+            subClassInfo.allOutReferences.insert(
+                subClassInfo.allOutReferences.end(),
+                classInfo.outReferences.begin(), classInfo.outReferences.end());
+            subClassInfo.allInReferences.insert(
+                subClassInfo.allInReferences.end(),
+                classInfo.inReferences.begin(), classInfo.inReferences.end());
+        }
+    }
+
+    for (auto& it: m_classInfoMap)
+    {
+        ClassInfo& classInfo = it.second;
+        classInfo.allOutReferences.insert(
+            classInfo.allOutReferences.end(),
+            classInfo.outReferences.begin(), classInfo.outReferences.end());
+        classInfo.allInReferences.insert(
+            classInfo.allInReferences.end(),
+            classInfo.inReferences.begin(), classInfo.inReferences.end());
+    }
 }
 
 StructuralContext::StructuralContext(const ClassDescriptor* rootClassDesc)
@@ -196,27 +237,23 @@ const std::vector<const ClassDescriptor*>& StructuralContext::getAllClasses()
 const std::vector<Reference>& StructuralContext::getIncomingReferences(
     const ClassDescriptor* classDesc) const
 {
-    Impl::ClassInfoMap::const_iterator it =
-        m_impl->m_classInfoMap.find(classDesc);
+    return m_impl->getClassInfo(classDesc).inReferences;
+}
 
-    if (it != m_impl->m_classInfoMap.end())
-    {
-        return it->second.inReferences;
-    }
-
-    throw std::runtime_error("Invalid class");
+const std::vector<Reference>& StructuralContext::getAllIncomingReferences(
+    const ClassDescriptor* classDesc) const
+{
+    return m_impl->getClassInfo(classDesc).allInReferences;
 }
 
 const std::vector<Reference>& StructuralContext::getOutgoingReferences(
     const ClassDescriptor* classDesc) const
 {
-    Impl::ClassInfoMap::const_iterator it =
-        m_impl->m_classInfoMap.find(classDesc);
+    return m_impl->getClassInfo(classDesc).outReferences;
+}
 
-    if (it != m_impl->m_classInfoMap.end())
-    {
-        return it->second.outReferences;
-    }
-
-    throw std::runtime_error("Invalid class");
+const std::vector<Reference>& StructuralContext::getAllOutgoingReferences(
+    const ClassDescriptor* classDesc) const
+{
+    return m_impl->getClassInfo(classDesc).allOutReferences;
 }

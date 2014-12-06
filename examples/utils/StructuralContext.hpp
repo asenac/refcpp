@@ -38,7 +38,13 @@ namespace ref
         const std::vector<Reference>& getIncomingReferences(
             const ClassDescriptor* classDesc) const;
 
+        const std::vector<Reference>& getAllIncomingReferences(
+            const ClassDescriptor* classDesc) const;
+
         const std::vector<Reference>& getOutgoingReferences(
+            const ClassDescriptor* classDesc) const;
+
+        const std::vector<Reference>& getAllOutgoingReferences(
             const ClassDescriptor* classDesc) const;
 
     protected:

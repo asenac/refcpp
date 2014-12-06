@@ -27,13 +27,15 @@ namespace ref
         StructuralContext(const StructuralContext&) = delete;
         ~StructuralContext();
 
-        const ClassDescriptor * getRootClassDescriptor() const;
+        const ClassDescriptor* getRootClass() const;
 
-        std::vector< const ClassDescriptor * > getAllClasses() const;
+        const std::vector<const ClassDescriptor*>& getAllClasses() const;
 
-        std::vector< Reference > getIncomingReferences(const ClassDescriptor * classDesc) const;
+        const std::vector<Reference>& getIncomingReferences(
+            const ClassDescriptor* classDesc) const;
 
-        std::vector< Reference > getOutgoingReferences(const ClassDescriptor * classDesc) const;
+        const std::vector<Reference>& getOutgoingReferences(
+            const ClassDescriptor* classDesc) const;
 
     protected:
         struct Impl;

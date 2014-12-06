@@ -3,81 +3,82 @@
 #include <unordered_map>
 #include <set>
 #include <list>
+#include <stdexcept>
 
 using namespace ref;
 
 namespace
 {
-    struct PathItem
+    struct IterationItem
     {
         Reference::ReferenceType referenceType;
-        const TypeDescriptor * currentNode;
+        const TypeDescriptor* desc;
 
-        PathItem()
-            : referenceType(Reference::kContained)
-            , currentNode()
-        {}
+        IterationItem() : referenceType(Reference::kContained), desc() {}
     };
 
-    Reference::ReferenceType
-    getReferenceType(PointerTypeDescriptor::PointerType type)
+    Reference::ReferenceType getReferenceType(
+        PointerTypeDescriptor::PointerType type)
     {
         switch (type)
         {
-        case PointerTypeDescriptor::kUnique:
-            return Reference::kOwned;
-        case PointerTypeDescriptor::kShared:
-            return Reference::kSharedOwned;
-        case PointerTypeDescriptor::kWeak:
-            return Reference::kWeak;
-        default:
-            break;
+            case PointerTypeDescriptor::kUnique:
+                return Reference::kOwned;
+            case PointerTypeDescriptor::kShared:
+                return Reference::kSharedOwned;
+            case PointerTypeDescriptor::kWeak:
+                return Reference::kWeak;
+            default:
+                break;
         }
 
         return Reference::kRaw;
     }
-} // namespace
+}  // namespace
 
 struct StructuralContext::Impl
 {
-    typedef const ClassDescriptor * Desc;
-    typedef std::vector< Reference > ReferenceVector;
+    typedef const ClassDescriptor* ClassDesc;
+    typedef std::vector<Reference> ReferenceVector;
 
-    Desc m_rootClassDesc;
+    ClassDesc m_rootClassDesc;
 
     struct ClassInfo
     {
-        std::set< Desc > subclasses;
-        std::set< Desc > allSubclasses;
-        // incoming
+        std::set<ClassDesc> subclasses;
+        std::set<ClassDesc> allSubclasses;
+        // incoming references
         ReferenceVector inReferences;
-        // outgoing
+        // outgoing references
         ReferenceVector outReferences;
     };
 
-    typedef std::unordered_map< Desc, ClassInfo > ClassInfoMap;
+    typedef std::unordered_map<ClassDesc, ClassInfo> ClassInfoMap;
     ClassInfoMap m_classInfoMap;
-    std::vector< const ClassDescriptor * > m_allClasses;
+    std::vector<const ClassDescriptor*> m_allClasses;
 
-    Impl (const ClassDescriptor * rootClassDesc);
+    Impl(const ClassDescriptor* rootClassDesc);
 };
 
-StructuralContext::Impl::Impl(const ClassDescriptor * rootClassDesc)
+StructuralContext::Impl::Impl(const ClassDescriptor* rootClassDesc)
     : m_rootClassDesc(rootClassDesc)
 {
-    std::list< Desc > pending;
-    std::set< Desc > processed;
+    std::list<ClassDesc> pending;
+    std::set<ClassDesc> processed;
     pending.push_back(rootClassDesc);
 
     while (!pending.empty())
     {
-        Desc current = pending.front();
+        ClassDesc current = pending.front();
         pending.pop_front();
 
         if (processed.count(current))
+        {
             continue;
+        }
 
-        Desc parent = current->getParentClassDescriptor();
+        // Class hierachy
+        ClassDesc parent = current->getParentClassDescriptor();
         if (parent)
         {
             if (!processed.count(parent))
@@ -87,7 +88,7 @@ StructuralContext::Impl::Impl(const ClassDescriptor * rootClassDesc)
 
             m_classInfoMap[parent].subclasses.insert(current);
 
-            Desc predecessor = current;
+            ClassDesc predecessor = current;
             while ((predecessor = predecessor->getParentClassDescriptor()))
             {
                 m_classInfoMap[predecessor].allSubclasses.insert(current);
@@ -96,70 +97,74 @@ StructuralContext::Impl::Impl(const ClassDescriptor * rootClassDesc)
 
         auto features = current->getFeatureDescriptors();
 
-        for (auto feature: features)
+        for (auto feature : features)
         {
             auto typeDesc = feature->getTypeDescriptor();
-            std::list< PathItem > path;
-            PathItem item;
-            item.currentNode = typeDesc;
+            std::list<IterationItem> path;
+            IterationItem item;
+            item.desc = typeDesc;
             path.push_back(item);
 
             while (!path.empty())
             {
-                PathItem currentItem = path.front();
-                auto typeDesc = currentItem.currentNode;
+                IterationItem currentItem = path.front();
+                auto typeDesc = currentItem.desc;
                 path.pop_front();
 
                 switch (typeDesc->getKind())
                 {
-                case TypeDescriptor::kClass:
+                    case TypeDescriptor::kClass:
                     {
-                        auto classDesc = static_cast< const ClassDescriptor * >(typeDesc);
-                        const Reference ref {currentItem.referenceType, current, feature, classDesc};
+                        auto classDesc = typeDesc->as<ClassDescriptor>();
+                        const Reference ref{currentItem.referenceType, current,
+                                            feature, classDesc};
 
                         m_classInfoMap[classDesc].inReferences.push_back(ref);
                         m_classInfoMap[current].outReferences.push_back(ref);
 
-                        if (currentItem.referenceType == Reference::kContained
-                                || currentItem.referenceType == Reference::kOwned
-                                || currentItem.referenceType == Reference::kSharedOwned)
+                        pending.push_back(classDesc);
+                    }
+                    break;
+                    case TypeDescriptor::kPointer:
+                    {
+                        if (currentItem.referenceType != Reference::kContained)
                         {
-                            pending.push_back(classDesc);
+                            throw std::runtime_error("Invalid model");
                         }
-                    }
-                    break;
-                case TypeDescriptor::kPointer:
-                    {
-                        auto ptrDesc = static_cast< const PointerTypeDescriptor * >(typeDesc);
-                        currentItem.currentNode = ptrDesc->getPointedTypeDescriptor();
-                        currentItem.referenceType = getReferenceType(ptrDesc->getPointerType());
+
+                        auto ptrDesc = typeDesc->as<PointerTypeDescriptor>();
+                        currentItem.desc = ptrDesc->getPointedTypeDescriptor();
+                        currentItem.referenceType =
+                            getReferenceType(ptrDesc->getPointerType());
 
                         path.push_back(currentItem);
                     }
                     break;
-                case TypeDescriptor::kPair:
+                    case TypeDescriptor::kPair:
                     {
-                        auto pairDesc = static_cast< const PairTypeDescriptor * >(typeDesc);
+                        auto pairDesc = typeDesc->as<PairTypeDescriptor>();
 
-                        currentItem.currentNode = pairDesc->getFirstTypeDescriptor();
+                        currentItem.desc = pairDesc->getFirstTypeDescriptor();
                         path.push_back(currentItem);
 
-                        currentItem.currentNode = pairDesc->getSecondTypeDescriptor();
+                        currentItem.desc = pairDesc->getSecondTypeDescriptor();
                         path.push_back(currentItem);
                     }
                     break;
-                // Containers
-                case TypeDescriptor::kList:
-                case TypeDescriptor::kMap:
-                case TypeDescriptor::kSet:
+                    // Containers
+                    case TypeDescriptor::kList:
+                    case TypeDescriptor::kMap:
+                    case TypeDescriptor::kSet:
                     {
-                        auto containerDesc = static_cast< const ContainerTypeDescriptor * >(typeDesc);
-                        currentItem.currentNode = containerDesc->getValueTypeDescriptor();
+                        auto containerDesc =
+                            typeDesc->as<ContainerTypeDescriptor>();
+                        currentItem.desc =
+                            containerDesc->getValueTypeDescriptor();
                         path.push_back(currentItem);
                     }
                     break;
-                default:
-                    break;
+                    default:
+                        break;
                 }
             }
         }
@@ -170,35 +175,48 @@ StructuralContext::Impl::Impl(const ClassDescriptor * rootClassDesc)
     m_allClasses = {processed.begin(), processed.end()};
 }
 
-StructuralContext::StructuralContext(const ClassDescriptor * rootClassDesc)
+StructuralContext::StructuralContext(const ClassDescriptor* rootClassDesc)
     : m_impl(new Impl(rootClassDesc))
-{}
-
-StructuralContext::~StructuralContext()
 {
-    delete m_impl;
 }
 
-std::vector< const ClassDescriptor * > StructuralContext::getAllClasses() const
+StructuralContext::~StructuralContext() { delete m_impl; }
+
+const ClassDescriptor* StructuralContext::getRootClass() const
+{
+    return m_impl->m_rootClassDesc;
+}
+
+const std::vector<const ClassDescriptor*>& StructuralContext::getAllClasses()
+    const
 {
     return m_impl->m_allClasses;
 }
 
-std::vector< Reference >
-StructuralContext::getIncomingReferences(const ClassDescriptor * classDesc) const
+const std::vector<Reference>& StructuralContext::getIncomingReferences(
+    const ClassDescriptor* classDesc) const
 {
-    Impl::ClassInfoMap::const_iterator it = m_impl->m_classInfoMap.find(classDesc);
+    Impl::ClassInfoMap::const_iterator it =
+        m_impl->m_classInfoMap.find(classDesc);
+
     if (it != m_impl->m_classInfoMap.end())
+    {
         return it->second.inReferences;
-    return std::vector< Reference >(); // TODO Exception?
+    }
+
+    throw std::runtime_error("Invalid class");
 }
 
-std::vector< Reference >
-StructuralContext::getOutgoingReferences(const ClassDescriptor * classDesc) const
+const std::vector<Reference>& StructuralContext::getOutgoingReferences(
+    const ClassDescriptor* classDesc) const
 {
-    Impl::ClassInfoMap::const_iterator it = m_impl->m_classInfoMap.find(classDesc);
-    if (it != m_impl->m_classInfoMap.end())
-        return it->second.outReferences;
-    return std::vector< Reference >(); // TODO Exception?
-}
+    Impl::ClassInfoMap::const_iterator it =
+        m_impl->m_classInfoMap.find(classDesc);
 
+    if (it != m_impl->m_classInfoMap.end())
+    {
+        return it->second.outReferences;
+    }
+
+    throw std::runtime_error("Invalid class");
+}

@@ -117,6 +117,8 @@ namespace ref
          */
         virtual Holder getValue(ModelClass * obj) const = 0;
 
+        virtual ModelClass * getObject(Holder h) const = 0;
+
         /**
          * @brief Returns the class descriptor for the class this feature
          * is defined in.

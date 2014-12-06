@@ -69,6 +69,8 @@ namespace ref
 
         Holder getValue(ModelClass* obj) const override;
 
+        ModelClass * getObject(Holder h) const override;
+
         const ClassDescriptor* getDefinedIn() const override;
     };
 

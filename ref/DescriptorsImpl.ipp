@@ -8,6 +8,7 @@
 #include <iterator>
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
 #include <boost/mpl/for_each.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -225,6 +226,19 @@ namespace ref
     {
         Class* realObj = static_cast<Class*>(obj);
         return Holder(&realObj->template get<Feature>(), getTypeDescriptor());
+    }
+
+    template <typename Class, typename Feature>
+    ModelClass* FeatureDescriptorImpl<Class, Feature>::getObject(Holder h) const
+    {
+        typedef typename Feature::type type;
+
+        type* value = h.get<type>();
+
+        Feature* feature = reinterpret_cast<Feature*>(
+            reinterpret_cast<char*>(value) - offsetof(Feature, value));
+
+        return static_cast<Class*>(feature);
     }
 
     template <typename Class, typename Feature>

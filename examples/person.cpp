@@ -34,19 +34,19 @@ int main(int argc, char **argv)
     Animal dog;
 
     // Direct access
-    me.set< Name >("Andres");
-    me.set< Surname >("Senac");
-    me.set< Age >(29);
-    const std::vector< std::string > emails = {"andres@senac.es", "asenac@senac.es"};
-    me.set< Emails >(emails);
-    me.get< Pets >().push_back(dog);
+    me.set<Name>("Andres");
+    me.set<Surname>("Senac");
+    me.set<Age>(29);
+    const std::vector<std::string> emails = {"andres@senac.es",
+                                             "asenac@senac.es"};
+    me.set<Emails>(emails);
+    me.get<Pets>().push_back(dog);
 
-    std::cout << me.get< Name >() << " "
-        << me.get< Surname >() << " "
-        << me.get< Age >() << std::endl;
+    std::cout << me.get<Name>() << " " << me.get<Surname>() << " "
+              << me.get<Age>() << std::endl;
 
     // Descriptors
-    const ClassDescriptor * classDesc = me.getClassDescriptor();
+    const ClassDescriptor *classDesc = me.getClassDescriptor();
     const FeatureDescriptorVector features =
         classDesc->getAllFeatureDescriptors();
 

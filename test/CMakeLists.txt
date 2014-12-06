@@ -1,0 +1,2 @@
+add_executable(test_descriptor test_descriptor.cpp)
+add_test(test_descriptor test_descriptor)

@@ -7,8 +7,13 @@ using namespace ref;
 
 struct MyFeature1 : String {};
 struct MyFeature2 : String {};
+struct MyFeature3 : Int64  {};
 
 struct MyTestClass : Class<MyTestClass, Features<MyFeature1, MyFeature2> >
+{
+};
+
+struct MySubClass : Class<MySubClass, Features<MyFeature3>, MyTestClass>
 {
 };
 
@@ -55,6 +60,15 @@ int main(int argc, char **argv)
 
         assert(values[0].second.get<std::string>() == &mtc.get<MyFeature1>());
         assert(values[1].second.get<std::string>() == &mtc.get<MyFeature2>());
+    }
+
+    {
+        const ClassDescriptor *subClassDesc =
+            MySubClass::getClassDescriptorInstance();
+
+        assert(subClassDesc->getParentClassDescriptor() == classDesc);
+        assert(subClassDesc->getAllFeatureDescriptors().size() == 3);
+        assert(subClassDesc->getFeatureDescriptors().size() == 1);
     }
 
     return 0;

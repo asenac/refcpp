@@ -233,7 +233,7 @@ namespace ref
     {
         assert(h.isValid());
         assert(h.descriptor() == getTypeDescriptor());
-        assert(h.isContained());
+        assert(!h.isContained());
 
         typedef typename Feature::type type;
 

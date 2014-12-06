@@ -43,13 +43,18 @@ int main(int argc, char **argv)
     }
 
     {
-        const auto values = classDesc->getFeatureValues(&mtc);
+        auto values = classDesc->getFeatureValues(&mtc);
+        assert(values.size() == 2);
 
         for (auto value: values)
         {
             assert(value.second.isValid());
             assert(!value.second.isContained());
+            assert(value.first->getObject(value.second) == &mtc);
         }
+
+        assert(values[0].second.get<std::string>() == &mtc.get<MyFeature1>());
+        assert(values[1].second.get<std::string>() == &mtc.get<MyFeature2>());
     }
 
     return 0;

@@ -19,6 +19,7 @@ int main(int argc, char **argv)
         MyTestClass::getClassDescriptorInstance();
 
     {
+        assert(classDesc);
         assert(classDesc == mtc.getClassDescriptor());
         assert(classDesc->getFeatureDescriptors().size() == 2);
         assert(classDesc->getAllFeatureDescriptors().size() == 2);

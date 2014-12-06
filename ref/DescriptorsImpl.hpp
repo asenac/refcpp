@@ -43,6 +43,9 @@ namespace ref
         const FeatureDescriptor* getFeatureDescriptor(
             std::string name) const override;
 
+        Holder getFeatureValue(ModelClass* obj,
+                               std::string name) const override;
+
         ModelClass* get(Holder h) const override;
 
         FeatureValueVector getFeatureValues(ModelClass* obj) const override;

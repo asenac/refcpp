@@ -166,6 +166,8 @@ namespace ref
          */
         virtual const FeatureDescriptor * getFeatureDescriptor(std::string name) const = 0;
 
+        virtual Holder getFeatureValue(ModelClass * obj, std::string name) const = 0;
+
         /**
          * @brief Returns the object contained in the passed holder.
          *

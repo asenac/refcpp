@@ -192,6 +192,15 @@ namespace ref
     }
 
     template <typename Class>
+    Holder ClassDescriptorImpl<Class>::getFeatureValue(ModelClass* obj,
+                                                       std::string name) const
+    {
+        FeatureDescriptorMap::const_iterator it = m_featureMap.find(name);
+        if (it != m_featureMap.end()) return it->second->getValue(obj);
+        return Holder();
+    }
+
+    template <typename Class>
     ModelClass* ClassDescriptorImpl<Class>::get(Holder h) const
     {
         return h.get<ModelClass>();

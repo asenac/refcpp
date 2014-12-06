@@ -62,11 +62,12 @@ int main(int argc, char **argv)
             const PrimitiveTypeDescriptor *priTypeDesc =
                 typeDesc->as<PrimitiveTypeDescriptor>();
             std::cout << featureDesc->getName() << " = "
-                << priTypeDesc->getString(h) << std::endl;
+                      << priTypeDesc->getString(h) << std::endl;
         }
         else
         {
-            std::cout << featureDesc->getName() << " = non-printable type!" << std::endl;
+            std::cout << featureDesc->getName() << " = non-printable type!"
+                      << std::endl;
         }
     }
 

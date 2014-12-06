@@ -6,3 +6,4 @@ add_test(test_feature test_feature)
 
 add_executable(test_structuralcontext test_structuralcontext.cpp)
 target_link_libraries(test_structuralcontext refcpp example_company)
+add_test(test_structuralcontext test_structuralcontext)

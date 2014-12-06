@@ -59,5 +59,7 @@ ModelClass* DefaultReferenceResolver::resolveId(
     ModelClass* fromObject, const ClassDescriptor* referencedClassDesc,
     const std::string& id)
 {
+    // XXX use shortest path from fromObject's class descriptor to
+    // referencedClassDesc
     return NULL;
 }

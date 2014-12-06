@@ -36,6 +36,8 @@ namespace detail
             }
             else if (c >= 'a' && c <= 'z')
                 res += c;
+            else if (c >= '0' && c <= '9')
+                res += c;
             else
                 res += '-';
         }

@@ -14,55 +14,53 @@ namespace ref
          */
         Holder() : m_descriptor(nullptr) {}
 
-        Holder(const Holder& h)
-            : m_impl(h.m_impl)
-            , m_descriptor(h.m_descriptor)
-        {}
-
-        template < typename T >
-        Holder(T * t, const TypeDescriptor * descriptor,
-                bool release = false)
-            : m_impl(new Impl< T >(t, release))
-            , m_descriptor(descriptor)
-        {}
-
-        template < typename T >
-        T * get()
+        Holder(const Holder& h) : m_impl(h.m_impl), m_descriptor(h.m_descriptor)
         {
-            return static_cast< Impl< T > * >(m_impl.get())->t;
         }
 
-        const TypeDescriptor * descriptor() const
+        template <typename T>
+        Holder(T* t, const TypeDescriptor* descriptor, bool release = false)
+            : m_impl(new Impl<T>(t, release)), m_descriptor(descriptor)
         {
-            return m_descriptor;
         }
 
-        bool isValid() const
+        template <typename T>
+        T* get()
         {
-            return !!m_impl;
+            return static_cast<Impl<T>*>(m_impl.get())->t;
         }
+
+        const TypeDescriptor* descriptor() const { return m_descriptor; }
+
+        bool isValid() const { return !!m_impl; }
+
+        bool isContained() const { return isValid() && m_impl->isContained(); }
 
     protected:
-        struct ImplBase {};
-        template < typename T >
-        struct Impl : ImplBase
+        struct ImplBase
         {
-            T * t;
-            bool release;
-            Impl(T* t_, bool release_)
-                : t(t_), release(release_)
-            {}
-            ~Impl()
-            {
-                if (release)
-                    delete t;
-            }
+            virtual bool isContained() const = 0;
         };
 
-        std::shared_ptr< ImplBase > m_impl;
-        const TypeDescriptor * m_descriptor;
+        template <typename T>
+        struct Impl : ImplBase
+        {
+            T* t;
+            bool release;
+            Impl(T* t_, bool release_) : t(t_), release(release_) {}
+
+            ~Impl()
+            {
+                if (release) delete t;
+            }
+
+            bool isContained() const override { return release; }
+        };
+
+        std::shared_ptr<ImplBase> m_impl;
+        const TypeDescriptor* m_descriptor;
     };
 
-} // namespace ref
+}  // namespace ref
 
-#endif // REF_HOLDER_HPP
+#endif  // REF_HOLDER_HPP

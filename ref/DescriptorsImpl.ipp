@@ -231,6 +231,10 @@ namespace ref
     template <typename Class, typename Feature>
     ModelClass* FeatureDescriptorImpl<Class, Feature>::getObject(Holder h) const
     {
+        assert(h.isValid());
+        assert(h.descriptor() == getTypeDescriptor());
+        assert(h.isContained());
+
         typedef typename Feature::type type;
 
         type* value = h.get<type>();

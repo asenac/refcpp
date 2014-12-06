@@ -59,8 +59,8 @@ int main(int argc, char **argv)
 
         if (typeDesc->getKind() == TypeDescriptor::kPrimitive)
         {
-            const PrimitiveTypeDescriptor * priTypeDesc =
-                static_cast< const PrimitiveTypeDescriptor * >(typeDesc);
+            const PrimitiveTypeDescriptor *priTypeDesc =
+                typeDesc->as<PrimitiveTypeDescriptor>();
             std::cout << featureDesc->getName() << " = "
                 << priTypeDesc->getString(h) << std::endl;
         }

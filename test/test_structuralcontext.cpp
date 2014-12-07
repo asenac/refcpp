@@ -51,6 +51,19 @@ int main(int argc, char **argv)
         assert(ctx.getAllOutgoingReferences(companyDesc).size() == 1);
         assert(ctx.getAllOutgoingReferences(departmentDesc).size() == 1);
         assert(ctx.getAllOutgoingReferences(employeeDesc).size() == 1);
+
+        auto empInRefs = ctx.getIncomingReferences(employeeDesc);
+        for (const auto& it: empInRefs)
+        {
+            assert(it.referencedClassDesc == employeeDesc);
+        }
+
+        assert(empInRefs[0].classDesc == departmentDesc);
+        assert(empInRefs[0].featureDesc ==
+               departmentDesc->getFeatureDescriptor("Employees"));
+        assert(empInRefs[1].classDesc == employeeDesc);
+        assert(empInRefs[1].featureDesc ==
+               employeeDesc->getFeatureDescriptor("Manager"));
     }
 
     return 0;

@@ -64,6 +64,14 @@ int main(int argc, char **argv)
         assert(empInRefs[1].classDesc == employeeDesc);
         assert(empInRefs[1].featureDesc ==
                employeeDesc->getFeatureDescriptor("Manager"));
+
+        // isReference
+        assert(
+            ctx.isReference(departmentDesc->getFeatureDescriptor("Employees")));
+        assert(!ctx.isReference(departmentDesc->getFeatureDescriptor("Name")));
+        assert(
+            ctx.isReference(companyDesc->getFeatureDescriptor("Departments")));
+        assert(!ctx.isReference(companyDesc->getFeatureDescriptor("Name")));
     }
 
     return 0;

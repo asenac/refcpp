@@ -47,6 +47,8 @@ namespace ref
         const std::vector<Reference>& getAllOutgoingReferences(
             const ClassDescriptor* classDesc) const;
 
+        bool isReference(const FeatureDescriptor* featureDesc) const;
+
     protected:
         struct Impl;
         Impl* m_impl;

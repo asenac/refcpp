@@ -59,6 +59,7 @@ struct StructuralContext::Impl
     typedef unordered_map<ClassDesc, ClassInfo> ClassInfoMap;
     ClassInfoMap m_classInfoMap;
     vector<const ClassDescriptor*> m_allClasses;
+    set<const FeatureDescriptor*> m_allReferences;
 
     Impl(const ClassDescriptor* rootClassDesc);
 
@@ -136,6 +137,8 @@ StructuralContext::Impl::Impl(const ClassDescriptor* rootClassDesc)
 
                         m_classInfoMap[classDesc].inReferences.push_back(ref);
                         m_classInfoMap[current].outReferences.push_back(ref);
+
+                        m_allReferences.insert(feature);
 
                         pending.push_back(classDesc);
                     }
@@ -257,4 +260,9 @@ const vector<Reference>& StructuralContext::getAllOutgoingReferences(
     const ClassDescriptor* classDesc) const
 {
     return m_impl->getClassInfo(classDesc).allOutReferences;
+}
+
+bool StructuralContext::isReference(const FeatureDescriptor* featureDesc) const
+{
+    return m_impl->m_allReferences.count(featureDesc) > 0;
 }

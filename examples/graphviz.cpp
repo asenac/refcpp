@@ -77,7 +77,7 @@ int main(int argc, char **argv)
     {
         if (auto parent = desc->getParentClassDescriptor())
         {
-            line() << desc->getName() << "->" << parent->getName();
+            line() << parent->getName() << "->" << desc->getName();
         }
     }
 

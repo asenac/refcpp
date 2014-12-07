@@ -65,7 +65,8 @@ int main(int argc, char **argv)
         for (const auto& ref : references)
         {
             line() << ref.classDesc->getName() << "->"
-                   << ref.referencedClassDesc->getName();
+                   << ref.referencedClassDesc->getName() << " [ label = \""
+                   << ref.featureDesc->getName() << "\" ];";
         }
     }
     cout << endl;
